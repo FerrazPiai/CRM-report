@@ -324,31 +324,22 @@
         .bar-value { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; white-space: nowrap; background: var(--bg-elevated); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border); pointer-events: none; }
 
         .loss-scroll-wrapper { flex: 1; overflow-y: auto; max-height: 460px; }
-        .loss-table { width: 100%; border-collapse: collapse; }
-        .loss-table thead { position: sticky; top: 0; z-index: 2; }
-        .loss-table th { padding: 10px 14px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); }
-        .loss-table th:nth-child(2) { text-align: center; }
-        .loss-table th:last-child { text-align: right; }
-        .loss-table td { padding: 14px 14px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
-        .loss-table tr:last-child td { border-bottom: none; }
-        .loss-table tr:hover td { background: rgba(255,255,255,0.02); }
-        .loss-name-cell { display: flex; align-items: center; gap: 12px; }
-        .loss-rank { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); background: var(--bg-surface); width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border); }
+        .loss-list { display: flex; flex-direction: column; gap: 0; }
+        .loss-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .loss-item:last-child { border-bottom: none; }
+        .loss-item-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+        .loss-item-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .loss-item-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .loss-rank { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); background: var(--bg-surface); width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border); }
         .loss-rank.top-3 { color: var(--primary); border-color: rgba(230,57,70,0.2); background: var(--primary-soft); }
-        .loss-name-info { flex: 1; min-width: 0; }
         .loss-name { font-weight: 500; color: var(--text-main); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .loss-bar-bg { height: 4px; background: var(--bg-color); border-radius: 2px; overflow: hidden; margin-top: 6px; }
-        .loss-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--primary), rgba(230,57,70,0.3)); transition: width 0.6s ease; }
-        .loss-count-cell { text-align: center; }
         .loss-count { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--primary); font-size: 14px; }
-        .loss-percent-cell { text-align: right; }
-        .loss-percent-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text-main); }
-        .loss-percent-bar { display: inline-block; width: 48px; height: 4px; background: var(--bg-color); border-radius: 2px; overflow: hidden; vertical-align: middle; margin-left: 8px; }
-        .loss-percent-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); transition: width 0.5s ease; }
-        .loss-total-row td { border-top: 2px solid var(--border-light) !important; padding-top: 16px; }
-        .loss-total-row .loss-name { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: 600; }
-        .loss-total-row .loss-count { color: var(--text-main); font-size: 16px; }
-        .loss-total-row .loss-percent-value { color: var(--text-muted); }
+        .loss-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-secondary); min-width: 42px; text-align: right; }
+        .loss-bar-bg { height: 4px; background: var(--bg-color); border-radius: 2px; overflow: hidden; }
+        .loss-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--primary), rgba(230,57,70,0.3)); transition: width 0.6s ease; }
+        .loss-total-item { border-top: 2px solid var(--border-light) !important; padding-top: 14px; margin-top: 2px; }
+        .loss-total-item .loss-item-header { margin-bottom: 0; }
+        .loss-total-label { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: 600; }
         .no-data-msg { color: var(--text-muted); font-size: 13px; text-align: center; padding: 40px 0; }
 
         /* ─── BILLING ─── */
@@ -779,12 +770,24 @@
         const total = entries.reduce((s, [, c]) => s + c, 0);
         if (entries.length === 0) { container.innerHTML = '<p class="no-data-msg">Nenhum motivo de perda registrado</p>'; return; }
 
-        let html = `<table class="loss-table"><thead><tr><th>Motivo de Perda</th><th>Qtd</th><th>% do Total</th></tr></thead><tbody>`;
+        let html = '<div class="loss-list">';
         entries.forEach(([name, count], idx) => {
             const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-            html += `<tr><td><div class="loss-name-cell"><div class="loss-rank ${idx < 3 ? 'top-3' : ''}">${idx + 1}</div><div class="loss-name-info"><div class="loss-name">${name}</div><div class="loss-bar-bg"><div class="loss-bar-fill" style="width:${pct}%"></div></div></div></div></td><td class="loss-count-cell"><span class="loss-count">${count.toLocaleString('pt-BR')}</span></td><td class="loss-percent-cell"><span class="loss-percent-value">${pct}%</span><span class="loss-percent-bar"><span class="loss-percent-bar-fill" style="width:${pct}%"></span></span></td></tr>`;
+            html += `<div class="loss-item">
+                <div class="loss-item-header">
+                    <div class="loss-item-left"><span class="loss-rank ${idx < 3 ? 'top-3' : ''}">${idx + 1}</span><span class="loss-name">${name}</span></div>
+                    <div class="loss-item-right"><span class="loss-count">${count.toLocaleString('pt-BR')}</span><span class="loss-pct">${pct}%</span></div>
+                </div>
+                <div class="loss-bar-bg"><div class="loss-bar-fill" style="width:${pct}%"></div></div>
+            </div>`;
         });
-        html += `<tr class="loss-total-row"><td><div class="loss-name-cell"><div class="loss-name" style="color:var(--text-muted);text-transform:uppercase;font-size:11px;letter-spacing:1px;">Total</div></div></td><td class="loss-count-cell"><span class="loss-count" style="color:var(--text-main);font-size:16px;">${total.toLocaleString('pt-BR')}</span></td><td class="loss-percent-cell"><span class="loss-percent-value" style="color:var(--text-muted);">100%</span></td></tr></tbody></table>`;
+        html += `<div class="loss-item loss-total-item">
+            <div class="loss-item-header">
+                <div class="loss-item-left"><span class="loss-total-label">Total</span></div>
+                <div class="loss-item-right"><span class="loss-count" style="color:var(--text-main);font-size:15px;">${total.toLocaleString('pt-BR')}</span><span class="loss-pct" style="color:var(--text-muted);">100%</span></div>
+            </div>
+        </div>`;
+        html += '</div>';
         container.innerHTML = html;
         document.getElementById('loss-client-badge').innerText = clientesReais[0]?.name || 'todos';
     }
