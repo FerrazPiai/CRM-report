@@ -226,13 +226,19 @@ async function buscarDadosCliente(cliente, dataInicio, dataFim) {
     });
 
     allLeads.forEach(lead => {
-        const d = new Date(lead.created_at * 1000);
-        const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthlyStats[mk]) monthlyStats[mk] = { leads: 0, won: 0, lost: 0 };
-        monthlyStats[mk].leads++;
-        if (globalWonStatusIds.has(lead.status_id)) monthlyStats[mk].won++;
+        const dCreated = new Date(lead.created_at * 1000);
+        const mkCreated = `${dCreated.getFullYear()}-${String(dCreated.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthlyStats[mkCreated]) monthlyStats[mkCreated] = { leads: 0, won: 0, lost: 0 };
+        monthlyStats[mkCreated].leads++;
+
+        const closedTs = lead.closed_at || lead.updated_at;
+        const dClosed = new Date(closedTs * 1000);
+        const mkClosed = `${dClosed.getFullYear()}-${String(dClosed.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthlyStats[mkClosed]) monthlyStats[mkClosed] = { leads: 0, won: 0, lost: 0 };
+
+        if (globalWonStatusIds.has(lead.status_id)) monthlyStats[mkClosed].won++;
         if (globalLostStatusIds.has(lead.status_id)) {
-            monthlyStats[mk].lost++;
+            monthlyStats[mkClosed].lost++;
             const rid = lead.loss_reason_id;
             if (rid && lossReasonsMap[rid]) lossReasonCounts[lossReasonsMap[rid]] = (lossReasonCounts[lossReasonsMap[rid]] || 0) + 1;
             else if (rid) lossReasonCounts['Motivo não identificado'] = (lossReasonCounts['Motivo não identificado'] || 0) + 1;
@@ -264,11 +270,17 @@ async function buscarDadosCliente(cliente, dataInicio, dataFim) {
             const diasSemAtt = (hoje - lead.updated_at) / 86400;
             const price = Number(lead.price) || 0;
 
-            // Monthly stats per pipeline
-            const d = new Date(lead.created_at * 1000);
-            const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (!pipelineMonthly[mk]) pipelineMonthly[mk] = { leads: 0, won: 0, lost: 0 };
-            pipelineMonthly[mk].leads++;
+            // Leads count by creation date
+            const dCreated = new Date(lead.created_at * 1000);
+            const mkCreated = `${dCreated.getFullYear()}-${String(dCreated.getMonth() + 1).padStart(2, '0')}`;
+            if (!pipelineMonthly[mkCreated]) pipelineMonthly[mkCreated] = { leads: 0, won: 0, lost: 0 };
+            pipelineMonthly[mkCreated].leads++;
+
+            // Won/lost by closing date
+            const closedTs = lead.closed_at || lead.updated_at;
+            const dClosed = new Date(closedTs * 1000);
+            const mkClosed = `${dClosed.getFullYear()}-${String(dClosed.getMonth() + 1).padStart(2, '0')}`;
+            if (!pipelineMonthly[mkClosed]) pipelineMonthly[mkClosed] = { leads: 0, won: 0, lost: 0 };
 
             if (!closedStatuses.includes(lead.status_id)) {
                 pipelineRevenue += price;
@@ -282,12 +294,11 @@ async function buscarDadosCliente(cliente, dataInicio, dataFim) {
                 if (wonStatusIds.includes(lead.status_id)) {
                     totalWonRevenue += price;
                     wonLeadsForCycle++;
-                    const closedAt = lead.closed_at || lead.updated_at;
-                    const cycle = (closedAt - lead.created_at) / 86400;
+                    const cycle = (closedTs - lead.created_at) / 86400;
                     if (cycle > 0) totalSalesCycleDays += cycle;
-                    pipelineMonthly[mk].won++;
+                    pipelineMonthly[mkClosed].won++;
                 } else if (lostStatusIds.includes(lead.status_id)) {
-                    pipelineMonthly[mk].lost++;
+                    pipelineMonthly[mkClosed].lost++;
                     const rid = lead.loss_reason_id;
                     if (rid && lossReasonsMap[rid]) pipelineLossReasons[lossReasonsMap[rid]] = (pipelineLossReasons[lossReasonsMap[rid]] || 0) + 1;
                     else if (rid) pipelineLossReasons['Motivo não identificado'] = (pipelineLossReasons['Motivo não identificado'] || 0) + 1;
