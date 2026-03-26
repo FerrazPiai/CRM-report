@@ -239,22 +239,6 @@
 
         /* ─── TOOLTIPS ─── */
         .th-tip { position: relative; cursor: help; }
-        .th-tip::after {
-            content: attr(data-tip); position: absolute; bottom: calc(100% + 10px); left: 50%;
-            transform: translateX(-50%) scale(0.95); background: #1a1a24; color: var(--text-secondary);
-            font-size: 12px; font-weight: 400; font-family: 'Outfit', sans-serif; text-transform: none;
-            letter-spacing: 0; line-height: 1.5; padding: 10px 14px; border-radius: 10px;
-            border: 1px solid var(--border-light); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            white-space: normal; width: max-content; max-width: 260px; pointer-events: none;
-            opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 50;
-        }
-        .th-tip::before {
-            content: ''; position: absolute; bottom: calc(100% + 4px); left: 50%;
-            transform: translateX(-50%); border: 6px solid transparent; border-top-color: #1a1a24;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 51;
-        }
-        .th-tip:hover::after, .th-tip:hover::before { opacity: 1; transform: translateX(-50%) scale(1); }
-        .th-tip:hover::before { transform: translateX(-50%); }
         .th-tip .tip-icon {
             display: inline-block; width: 14px; height: 14px; border-radius: 50%;
             background: var(--bg-color); border: 1px solid var(--border-light); font-size: 9px;
@@ -262,6 +246,22 @@
             vertical-align: middle; font-style: normal; font-weight: 600; transition: all 0.2s;
         }
         .th-tip:hover .tip-icon { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+        .tooltip-popup {
+            position: fixed; background: #1a1a24; color: var(--text-secondary);
+            font-size: 12px; font-weight: 400; font-family: 'Outfit', sans-serif; text-transform: none;
+            letter-spacing: 0; line-height: 1.5; padding: 10px 14px; border-radius: 10px;
+            border: 1px solid var(--border-light); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            white-space: normal; width: max-content; max-width: 260px; pointer-events: none;
+            opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 9999;
+            transform: translateX(-50%) scale(0.95);
+        }
+        .tooltip-popup.visible { opacity: 1; transform: translateX(-50%) scale(1); }
+        .tooltip-arrow {
+            position: fixed; border: 6px solid transparent; border-bottom-color: #1a1a24;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 10000;
+            transform: translateX(-50%);
+        }
+        .tooltip-arrow.visible { opacity: 1; }
 
         /* ─── FUNNEL SECTION ─── */
         .funnel-section { background: var(--card-bg); padding: 30px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 32px; }
@@ -501,6 +501,45 @@
 </div>
 
 <script>
+    // ─── TOOLTIP SYSTEM ───
+    (function() {
+        const popup = document.createElement('div');
+        popup.className = 'tooltip-popup';
+        document.body.appendChild(popup);
+        const arrow = document.createElement('div');
+        arrow.className = 'tooltip-arrow';
+        document.body.appendChild(arrow);
+
+        document.querySelectorAll('.th-tip[data-tip]').forEach(th => {
+            th.addEventListener('mouseenter', () => {
+                const rect = th.getBoundingClientRect();
+                const text = th.getAttribute('data-tip');
+                popup.textContent = text;
+                popup.classList.add('visible');
+                arrow.classList.add('visible');
+                const cx = rect.left + rect.width / 2;
+                const top = rect.bottom + 10;
+                popup.style.left = cx + 'px';
+                popup.style.top = top + 'px';
+                arrow.style.left = cx + 'px';
+                arrow.style.top = (rect.bottom - 2) + 'px';
+                // Prevent going off-screen right
+                const popRect = popup.getBoundingClientRect();
+                if (popRect.right > window.innerWidth - 8) {
+                    const shift = popRect.right - window.innerWidth + 8;
+                    popup.style.left = (cx - shift) + 'px';
+                }
+                if (popRect.left < 8) {
+                    popup.style.left = (popRect.width / 2 + 8) + 'px';
+                }
+            });
+            th.addEventListener('mouseleave', () => {
+                popup.classList.remove('visible');
+                arrow.classList.remove('visible');
+            });
+        });
+    })();
+
     let dadosGlobais = [];
 
     const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
