@@ -372,15 +372,17 @@
                     <input type="date" id="date-start" class="form-control" title="Data Inicial">
                     <span class="date-separator">até</span>
                     <input type="date" id="date-end" class="form-control" title="Data Final">
-                    <button id="btn-all-time" class="btn btn-secondary">Todo o Período</button>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <button id="btn-download-report" class="btn btn-secondary">
-                        <i class="fa-solid fa-download"></i> Baixar Relatório
-                    </button>
-                    <button id="btn-update" class="btn btn-primary">⟳ &nbsp;Atualizar Dados</button>
-                </div>
+                <button id="btn-all-time" class="btn btn-secondary">Todo o Período</button>
             </div>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button id="btn-download-report" class="btn btn-secondary" style="color: white; border-color: rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-download"></i> Baixar Relatório
+                </button>
+                <button id="btn-update" class="btn btn-primary">⟳ &nbsp;Atualizar Dados</button>
+            </div>
+            
+        </div>
 
             <div class="summary-cards">
                 <div class="card"><div class="card-accent"></div><h3>Total de Clientes</h3><div class="value" id="total-clients">0</div><div class="card-sub" id="total-leads-sub">0 leads no CRM</div></div>
