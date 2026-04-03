@@ -332,7 +332,8 @@
                 // Inverte para exibir os mais recentes no topo
                 htmlFiles.reverse().forEach(file => {
                     const nomeFormatado = file.name.replace('.html', '').replace(/[-_]/g, ' ');
-                    const urlVisualizacao = file.html_url; // Link para ver o código no GitHub
+                    // Monta a URL pública do GitHub Pages para renderizar o HTML
+const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folderPath}/${file.name}`;
 
                     const card = `
                         <div class="fade-in-up bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer">
