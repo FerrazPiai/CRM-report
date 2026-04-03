@@ -392,7 +392,10 @@
                     <input type="date" id="date-end" class="form-control" title="Data Final">
                     <button id="btn-all-time" class="btn btn-secondary">Todo o Período</button>
                 </div>
-                <button id="btn-update" class="btn btn-primary">⟳ &nbsp;Atualizar Dados</button>
+                <button id="btn-download-report" class="btn btn-secondary" style="margin-right: 10px;">
+    <i class="fa-solid fa-download"></i> Baixar One Page Report
+</button>
+<button id="btn-update" class="btn btn-primary">⟳ &nbsp;Atualizar Dados</button>
             </div>
 
             <div class="summary-cards">
@@ -498,7 +501,6 @@
         </div>
     </main>
 
-    <!-- SCRIPTS 100% FIÉIS AO SEU CÓDIGO ORIGINAL -->
     <script>
         // Lógica visual simples para os menus laterais novos
         function handleMenuClick(menuName) {
@@ -896,6 +898,157 @@
             document.getElementById('funnel-lost-percent').innerText = `${lostP}% de perda`;
         }
 
+        // ─── GERAÇÃO DO ONE PAGE REPORT ───
+        function gerarOnePageReport() {
+            const cid = document.getElementById('client-selector').value;
+            
+            let cliente = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
+            
+            if (!cliente) {
+                alert("Por favor, selecione um cliente ou atualize os dados primeiro.");
+                return;
+            }
+
+            const dataInicio = document.getElementById('date-start').value || "Início";
+            const dataFim = document.getElementById('date-end').value || "Hoje";
+            const periodoStr = dataInicio !== "Início" ? `${dataInicio} até ${dataFim}` : "Todo Período";
+
+            const leadsTotais = cliente.leadsLast30Days || 0;
+            const vendas = cliente.pipelines?.[0]?.results?.won || 0;
+            const perdas = cliente.pipelines?.[0]?.results?.lost || 0;
+            const receita = cliente.wonRevenue || 0;
+            const taxaConversao = vendas + perdas > 0 ? (vendas / (vendas + perdas) * 100).toFixed(1) : 0;
+            const taxaPerda = vendas + perdas > 0 ? (perdas / (vendas + perdas) * 100).toFixed(1) : 0;
+            const ciclo = cliente.avgSalesCycle || 0;
+
+            let motivosPerdaHTML = '';
+            if (cliente.pipelines?.[0]?.lossReasons && cliente.pipelines[0].lossReasons.length > 0) {
+                const totalPerdas = cliente.pipelines[0].lossReasons.reduce((acc, curr) => acc + curr.count, 0);
+                motivosPerdaHTML = cliente.pipelines[0].lossReasons.map((motivo, index) => {
+                    const pct = totalPerdas > 0 ? ((motivo.count / totalPerdas) * 100).toFixed(1) : 0;
+                    return `
+                    <div class="flex items-center justify-between mb-3 text-sm">
+                        <div class="flex items-center gap-3 w-1/2">
+                            <span class="bg-red-900/30 text-red-500 font-mono text-xs px-2 py-1 rounded border border-red-500/20">${index + 1}</span>
+                            <span class="text-gray-200 truncate">${motivo.name}</span>
+                        </div>
+                        <div class="flex items-center justify-end gap-4 w-1/2">
+                            <span class="text-red-500 font-bold font-mono">${motivo.count}</span>
+                            <span class="text-gray-500 font-mono text-xs w-10 text-right">${pct}%</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-black/40 h-1.5 rounded-full mb-4 overflow-hidden">
+                        <div class="bg-gradient-to-r from-red-600 to-red-900 h-full rounded-full" style="width: ${pct}%"></div>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            const reportHTML = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Relatório Saúde CRM - ${cliente.name}</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Outfit', sans-serif; background-color: #0a0a0a; color: #eaeaf0; }
+                    .font-mono { font-family: 'JetBrains Mono', monospace; }
+                    .card { background: #141414; border: 1px solid #262626; border-radius: 12px; }
+                </style>
+            </head>
+            <body class="p-8 max-w-6xl mx-auto">
+                <header class="flex items-center justify-between mb-10 pb-6 border-b border-white/10">
+                    <div class="flex items-center gap-4">
+                        <h1 class="text-2xl font-bold text-red-600 tracking-tight">V4 COMPANY</h1>
+                        <span class="text-gray-400 border border-gray-700 bg-gray-800/50 px-3 py-1 text-sm rounded-full">Operação: ${cliente.name}</span>
+                        <span class="text-gray-400 border border-gray-700 bg-gray-800/50 px-3 py-1 text-sm rounded-full">${periodoStr}</span>
+                    </div>
+                </header>
+
+                <h2 class="text-3xl font-bold mb-8">Relatório de Saúde CRM</h2>
+
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="card p-6">
+                        <h3 class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Total de Leads</h3>
+                        <div class="text-4xl font-bold font-mono">${leadsTotais}</div>
+                        <div class="text-sm text-gray-500 mt-1">Cadastrados no CRM</div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Vendas Realizadas</h3>
+                        <div class="text-4xl font-bold text-green-500 font-mono">${vendas}</div>
+                        <div class="text-sm text-gray-500 mt-1">${taxaConversao}% de conversão</div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Negócios Perdidos</h3>
+                        <div class="text-4xl font-bold text-red-500 font-mono">${perdas}</div>
+                        <div class="text-sm text-gray-500 mt-1">${taxaPerda}% de perda</div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Receita Gerada</h3>
+                        <div class="text-4xl font-bold text-green-500 font-mono">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(receita)}</div>
+                        <div class="text-sm text-gray-500 mt-1">Ciclo médio de ${ciclo} dias</div>
+                    </div>
+                </div>
+
+                <div class="card p-8 mb-8 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 class="text-xl font-bold">Avaliação de Saúde do CRM</h3>
+                        <div class="bg-green-500 text-black font-bold text-xl px-4 py-2 rounded-lg font-mono">7/10</div>
+                    </div>
+                    <div class="flex items-center gap-2 text-green-400 font-semibold mb-4">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Saudável — Recorrente
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-4">
+                        <strong>Objetivo:</strong> Monitorar a eficiência do funil de vendas, identificar gargalos operacionais e maximizar a conversão de leads da ${cliente.name}.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        A operação apresenta um volume consistente de geração de leads e ciclo de vendas de (${ciclo}d), indicando um processo ágil. Porém, a taxa de perda de ${taxaPerda}% revela oportunidades significativas de melhoria na qualificação e follow-up.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-bold flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> Vitórias do Período</h3>
+                        <div class="card p-5 border-green-500/20 bg-green-900/5">
+                            <h4 class="font-bold text-sm text-green-400 mb-1">Ciclo de Vendas Ágil: ${ciclo} dias</h4>
+                            <p class="text-xs text-gray-400">O ciclo médio de fechamento indica um processo de decisão rápido e uma operação bem ajustada.</p>
+                        </div>
+
+                        <h3 class="text-lg font-bold flex items-center gap-2 mt-8"><span class="w-2 h-2 rounded-full bg-red-500"></span> Oportunidades</h3>
+                        <div class="card p-5 border-red-500/20 bg-red-900/5">
+                            <h4 class="font-bold text-sm text-red-500 mb-1">Taxa de Perda: ${taxaPerda}%</h4>
+                            <p class="text-xs text-gray-400 mb-2">Mais da metade dos negócios resultam em perda. O volume absoluto demanda atenção.</p>
+                            <p class="text-xs text-gray-300"><strong>Sugestão:</strong> Implementar qualificação mais rigorosa na entrada do funil.</p>
+                        </div>
+                    </div>
+
+                    <div class="card p-8">
+                        <h3 class="text-lg font-bold mb-6 border-l-2 border-red-500 pl-3">Motivos de Perda</h3>
+                        <div class="h-[400px] overflow-y-auto pr-2">
+                            ${motivosPerdaHTML || '<p class="text-gray-500 text-sm">Sem dados suficientes.</p>'}
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            `;
+
+            const blob = new Blob([reportHTML], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `V4_Report_${cliente.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
         // ─── API FETCH ───
         async function buscarDadosDaApi(dataInicioStr = '', dataFimStr = '') {
             try {
@@ -934,6 +1087,10 @@
         // ─── EVENTS ───
         document.getElementById('btn-all-time').addEventListener('click', () => { document.getElementById('date-start').value = ''; document.getElementById('date-end').value = ''; buscarDadosDaApi(); });
         document.getElementById('btn-update').addEventListener('click', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
+        
+        // NOVO EVENTO ADICIONADO PARA O BOTÃO DOWNLOAD
+        document.getElementById('btn-download-report').addEventListener('click', gerarOnePageReport);
+        
         document.getElementById('client-selector').addEventListener('change', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
         document.getElementById('recorrencia-filter').addEventListener('change', () => { aplicarFiltroRecorrencia(); });
         document.getElementById('pipeline-selector').addEventListener('change', (e) => {
