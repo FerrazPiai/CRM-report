@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discovery AI - V4 Company</title>
     
-    <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
-    <!-- Fontes (Outfit, JetBrains Mono e Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Configuração de Cores Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -37,7 +33,6 @@
         }
     </script>
 
-    <!-- CSS CUSTOMIZADO -->
     <style>
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -76,17 +71,14 @@
 </head>
 <body class="flex h-screen w-full overflow-hidden bg-mainbg font-sans text-gray-200">
 
-    <!-- BARRA LATERAL (SIDEBAR V4) -->
     <aside class="w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-20 shadow-2xl border-r border-white/5 relative">
         <div class="w-full flex flex-col">
-            <!-- Área da Logo -->
             <div class="w-full flex justify-center px-8 mb-12 mt-2">
                 <div class="w-full flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer">
                     <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="max-w-full h-9 object-contain drop-shadow-md" />
                 </div>
             </div>
 
-            <!-- Menu de Navegação -->
             <nav class="flex flex-col w-full px-6 space-y-2">
                 <a href="index.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
                     <i class="fa-solid fa-chart-pie text-lg group-hover:text-red-400 transition-colors w-6"></i>
@@ -98,7 +90,6 @@
                     <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Planejamentos</span>
                 </a>
                 
-                <!-- Discovery: ATIVO -->
                 <a href="discovery.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-white bg-gradient-to-r from-red-900/40 to-transparent border-l-4 border-red-600 shadow-sm transition-all duration-300 focus:outline-none">
                     <i class="fa-solid fa-file-lines text-lg text-red-500 w-6"></i>
                     <span class="font-medium tracking-wide text-sm">Discovery</span>
@@ -113,7 +104,6 @@
             </nav>
         </div>
 
-        <!-- Perfil do Usuário -->
         <div class="px-6 w-full mt-auto">
             <button class="flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group focus:outline-none">
                 <img src="https://i.pravatar.cc/150?img=11" alt="Avatar Usuário" class="w-10 h-10 rounded-full border-2 border-gray-700 group-hover:border-red-500 transition-colors object-cover">
@@ -126,17 +116,14 @@
         </div>
     </aside>
 
-    <!-- ÁREA PRINCIPAL -->
     <main class="flex-1 h-full w-full relative overflow-y-auto overflow-x-hidden font-inter">
         
-        <!-- Background Elements -->
         <div class="bg-pattern"></div>
         <div class="glow-effect glow-left"></div>
         <div class="glow-effect glow-right"></div>
 
         <div class="max-w-[1200px] mx-auto relative z-10 px-8 pb-20">
             
-            <!-- HEADER TOPO -->
             <header class="flex flex-col md:flex-row justify-between items-center py-8 mb-8 border-b border-white/5">
                 <div class="flex gap-8 mb-4 md:mb-0">
                     <h2 class="text-white text-lg font-sans font-bold tracking-wide flex items-center gap-2">
@@ -149,13 +136,10 @@
                 </a>
             </header>
 
-            <!-- SEÇÃO 1: HERO / UPLOAD DE BRIEFING -->
             <section class="fade-in-up mb-20">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-cardbg border border-white/5 p-10 md:p-14 rounded-[40px] shadow-2xl relative overflow-hidden">
-                    <!-- Detalhe visual de luz dentro do card -->
                     <div class="absolute top-0 right-0 w-64 h-64 bg-v4red/10 rounded-full filter blur-[80px] pointer-events-none"></div>
 
-                    <!-- Textos Esquerda -->
                     <div class="relative z-10">
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-v4red/10 border border-v4red/20 text-v4red text-xs font-bold uppercase tracking-wider mb-6">
                             <i class="fa-solid fa-brain"></i> IA de Vendas
@@ -172,7 +156,6 @@
                         </button>
                     </div>
 
-                    <!-- Upload Direita -->
                     <div class="upload-area w-full relative z-10">
                         <input type="file" id="file-upload" accept="application/pdf" class="hidden">
                         <label for="file-upload" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-[350px] border-2 border-dashed border-white/20 rounded-3xl bg-black/40 hover:bg-v4red/5 hover:border-v4red/50 cursor-pointer transition-all duration-300 group overflow-hidden">
@@ -190,7 +173,6 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 2: ÚLTIMOS ROTEIROS GERADOS -->
             <section class="fade-in-up delay-100">
                 <div class="flex justify-between items-center mb-8">
                     <div>
@@ -202,10 +184,8 @@
                     </button>
                 </div>
 
-                <!-- Grid de Roteiros -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                    <!-- Card Roteiro 1 -->
                     <div class="bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer">
                         <div class="flex justify-between items-start mb-4">
                             <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Pronto para Call</span>
@@ -224,7 +204,6 @@
                         </div>
                     </div>
 
-                    <!-- Card Roteiro 2 -->
                     <div class="bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer">
                         <div class="flex justify-between items-start mb-4">
                             <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Pronto para Call</span>
@@ -243,7 +222,6 @@
                         </div>
                     </div>
 
-                    <!-- Card Roteiro 3 -->
                     <div class="bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer">
                         <div class="flex justify-between items-start mb-4">
                             <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Processando IA...</span>
@@ -265,16 +243,12 @@
                 </div>
             </section>
 
-        </div> <!-- /max-w -->
-
-        <!-- MODAL PREMIUM -->
-        <div id="custom-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+        </div> <div id="custom-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
             <div class="modal-content bg-cardbg border border-white/10 rounded-3xl p-8 max-w-sm w-full mx-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-v4red to-red-900"></div>
                 
                 <div class="modal-icon w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">
-                    <!-- Ícone injetado pelo JS -->
-                </div>
+                    </div>
                 
                 <h2 id="modal-title" class="font-sans text-2xl font-bold text-white mb-2">Sucesso!</h2>
                 <p id="modal-message" class="text-gray-400 text-sm mb-8">O documento foi enviado para a IA.</p>
@@ -287,7 +261,6 @@
 
     </main>
 
-    <!-- SCRIPTS DE UPLOAD E WEBHOOK -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
@@ -332,11 +305,6 @@
                 if (!modal) return;
                 modal.classList.remove('show');
                 setTimeout(() => modal.classList.add('hidden'), 300);
-                
-                if (btnStart && btnStart.textContent === "Sucesso!") {
-                    // Aqui futuramente você pode redirecionar para a tela do script gerado
-                    location.reload(); 
-                }
             }
 
             if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
@@ -385,7 +353,7 @@
             }
 
             // ========================================================
-            // 3. ENVIO PARA O N8N (SIMULADO / PREPARADO)
+            // 3. ENVIO PARA O N8N 
             // ========================================================
             if (btnStart) {
                 btnStart.addEventListener('click', async () => {
@@ -413,20 +381,48 @@
                         
                         if (!response.ok) throw new Error("Erro no servidor do n8n");
                         
-                        // Recebe o HTML preenchido da IA
+                        // 1. Recebe o HTML preenchido da IA
                         const roteiroHtml = await response.text();
 
-                        // Restaura o botão visualmente
+                        // 2. Transforma o HTML numa URL virtual para não ser bloqueada pelo Pop-up
+                        const blob = new Blob([roteiroHtml], { type: 'text/html' });
+                        const scriptUrl = URL.createObjectURL(blob);
+
+                        // 3. Pega o nome do arquivo PDF para usar como título do Card
+                        const nomeCliente = selectedFile.name.replace('.pdf', '');
+
+                        // 4. Cria o novo Card visual idêntico ao seu layout
+                        const novoCard = document.createElement('div');
+                        novoCard.className = "fade-in-up bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer";
+                        novoCard.innerHTML = `
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Pronto para Call</span>
+                                <i class="fa-solid fa-file-lines text-gray-600 group-hover:text-v4red transition-colors text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-1">${nomeCliente}</h3>
+                            <p class="text-sm text-gray-400 mb-6 line-clamp-2">Roteiro gerado com sucesso após análise do briefing pela IA de Vendas.</p>
+                            
+                            <div class="mt-auto border-t border-white/5 pt-4 flex justify-between items-center">
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <i class="fa-regular fa-clock"></i> Agora mesmo
+                                </div>
+                                <a href="${scriptUrl}" target="_blank" class="text-white bg-white/5 hover:bg-v4red px-4 py-2 rounded-lg text-xs font-semibold transition-colors">
+                                    Abrir Script
+                                </a>
+                            </div>
+                        `;
+
+                        // 5. Injeta o novo Card na seção "Últimos Roteiros" (como o primeiro da lista)
+                        const gridRoteiros = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
+                        if (gridRoteiros) {
+                            gridRoteiros.prepend(novoCard);
+                        }
+
+                        // 6. Restaura o botão visualmente e mostra o modal de sucesso
                         btnStart.textContent = "Sucesso!";
                         btnStart.classList.replace('from-v4red', 'from-green-600');
                         btnStart.classList.replace('to-red-800', 'to-green-800');
-                        showModal("Roteiro em Geração!", "O documento foi processado e aberto em uma nova aba.", "success");
-                        
-                        // Abre a nova guia com o roteiro pronto
-                        const novaAba = window.open('', '_blank');
-                        novaAba.document.open();
-                        novaAba.document.write(roteiroHtml);
-                        novaAba.document.close();
+                        showModal("Roteiro Gerado!", "O roteiro já está disponível na lista de Últimos Roteiros logo abaixo.", "success");
 
                     } catch (error) {
                         console.error("Erro:", error);
