@@ -406,8 +406,7 @@
                         // SIMULAÇÃO DO TEMPO DE RESPOSTA DO N8N (Remova isso ao integrar a URL real)
                         await new Promise(r => setTimeout(r, 2000));
                         
-                        /* LÓGICA REAL (Descomente quando for plugar o N8N):
-                        const WEBHOOK_URL = 'SUA_URL_DO_N8N_AQUI';
+                        const WEBHOOK_URL = 'https://ferrazpiai-n8n-editor.uyk8ty.easypanel.host/webhook/5f6f48fb-8ddc-4cd1-8371-ebcd3f6277de';
                         const formData = new FormData();
                         formData.append('file', selectedFile);
                         formData.append('type', 'discovery_briefing');
@@ -420,7 +419,6 @@
                         if (!response.ok) throw new Error("Erro no servidor");
                         */
 
-                        // SUCESSO VISUAL
                         btnStart.textContent = "Sucesso!";
                         btnStart.classList.replace('from-v4red', 'from-green-600');
                         btnStart.classList.replace('to-red-800', 'to-green-800');
