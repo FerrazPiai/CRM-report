@@ -309,9 +309,9 @@
             if (!grid) return;
             
             // ⚠️ IMPORTANTE: Substitua pelos dados do seu repositório ⚠️
-            const githubOwner = 'SEU_USUARIO_OU_ORGANIZACAO'; 
-            const githubRepo = 'NOME_DO_SEU_REPOSITORIO';
-            const folderPath = ''; // Ex: 'roteiros' (deixe vazio se os arquivos salvam na raiz)
+            const githubOwner = 'rafaelmiacci-crypto'; 
+            const githubRepo = 'dashboard_crm';
+            const folderPath = 'roteiros';
             
             try {
                 const response = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${folderPath}`);
