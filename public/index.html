@@ -152,29 +152,22 @@
         .scroll-indicator.visible { display: inline-flex; }
         @keyframes fadeInOut { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; display: none; } }
 
+        /* TABELA CORRIGIDA: Sem duplicações, com table-layout: fixed e border-collapse: separate */
         table { width: 100%; min-width: 1280px; border-collapse: separate; border-spacing: 0; table-layout: fixed; text-indent: initial; }
         th { padding: 14px 22px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; z-index: 3; }
-        th:first-child, td:first-child { position: sticky; left: 0; z-index: 4; background: var(--card-bg); width: 280px; }
-        th:first-child { background: var(--bg-surface); z-index: 6; }
-        td:first-child::after { content: ''; position: absolute; top: 0; bottom: 0; right: -12px; width: 12px; background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent); pointer-events: none; }
+        
+        /* Fundo sólido e largura fixa na coluna congelada para não quebrar */
+        th:first-child, td:first-child { position: sticky; left: 0; z-index: 4; background: #160303; width: 280px; }
+        th:first-child { background: #1f0505; z-index: 6; }
+        td:first-child::after { content: ''; position: absolute; top: 0; bottom: 0; right: -12px; width: 12px; background: linear-gradient(90deg, rgba(0,0,0,0.4), transparent); pointer-events: none; }
+        
         td { padding: 18px 22px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.015); color: var(--text-main); }
-        tr:hover td:first-child { background: var(--card-bg-hover); }
-        td strong { color: var(--text-main); font-weight: 600; }
-        @keyframes fadeInOut { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; display: none; } }
-
-        table { width: 100%; border-collapse: collapse; min-width: 1280px; text-indent: initial; border-spacing: 2px; }
-        th { padding: 14px 22px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; z-index: 3; }
-        th:first-child, td:first-child { position: sticky; left: 0; z-index: 4; background: var(--card-bg); }
-        th:first-child { background: var(--bg-surface); z-index: 6; }
-        td:first-child::after { content: ''; position: absolute; top: 0; bottom: 0; right: -12px; width: 12px; background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent); pointer-events: none; }
-        td { padding: 18px 22px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.015); color: var(--text-main); }
-        tr:hover td:first-child { background: var(--card-bg-hover); }
+        tr:hover td:first-child { background: #1f0505; }
         td strong { color: var(--text-main); font-weight: 600; }
         
+        /* RESTANTE DAS CLASSES VISUAIS */
         .admin-count { font-size: 12px; color: var(--text-muted); margin-left: 6px; }
         .finance-text { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 700; font-size: 13px; }
         .cycle-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
