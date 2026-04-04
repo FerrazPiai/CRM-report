@@ -505,459 +505,725 @@
         </div>
     </main>
 
-    <!-- SCRIPTS 100% FIÉIS AO SEU CÓDIGO ORIGINAL -->
     <script>
-        // Lógica visual simples para os menus laterais novos
-        function handleMenuClick(menuName) {
-            console.log(`Menu [${menuName}] clicado!`);
-        }
+        // Lógica visual simples para os menus laterais novos
+        function handleMenuClick(menuName) {
+            console.log(`Menu [${menuName}] clicado!`);
+        }
 
-        // ─── TOOLTIP SYSTEM ───
-        (function() {
-            const popup = document.createElement('div');
-            popup.className = 'tooltip-popup';
-            document.body.appendChild(popup);
-            const arrow = document.createElement('div');
-            arrow.className = 'tooltip-arrow';
-            document.body.appendChild(arrow);
+        // ─── TOOLTIP SYSTEM ───
+        (function() {
+            const popup = document.createElement('div');
+            popup.className = 'tooltip-popup';
+            document.body.appendChild(popup);
+            const arrow = document.createElement('div');
+            arrow.className = 'tooltip-arrow';
+            document.body.appendChild(arrow);
 
-            document.querySelectorAll('.th-tip[data-tip]').forEach(th => {
-                th.addEventListener('mouseenter', () => {
-                    const rect = th.getBoundingClientRect();
-                    const text = th.getAttribute('data-tip');
-                    popup.textContent = text;
-                    popup.classList.add('visible');
-                    arrow.classList.add('visible');
-                    const cx = rect.left + rect.width / 2;
-                    const top = rect.bottom + 10;
-                    popup.style.left = cx + 'px';
-                    popup.style.top = top + 'px';
-                    arrow.style.left = cx + 'px';
-                    arrow.style.top = (rect.bottom - 2) + 'px';
-                    
-                    const popRect = popup.getBoundingClientRect();
-                    if (popRect.right > window.innerWidth - 8) {
-                        const shift = popRect.right - window.innerWidth + 8;
-                        popup.style.left = (cx - shift) + 'px';
-                    }
-                    if (popRect.left < 8) {
-                        popup.style.left = (popRect.width / 2 + 8) + 'px';
-                    }
-                });
-                th.addEventListener('mouseleave', () => {
-                    popup.classList.remove('visible');
-                    arrow.classList.remove('visible');
-                });
-            });
-        })();
+            document.querySelectorAll('.th-tip[data-tip]').forEach(th => {
+                th.addEventListener('mouseenter', () => {
+                    const rect = th.getBoundingClientRect();
+                    const text = th.getAttribute('data-tip');
+                    popup.textContent = text;
+                    popup.classList.add('visible');
+                    arrow.classList.add('visible');
+                    const cx = rect.left + rect.width / 2;
+                    const top = rect.bottom + 10;
+                    popup.style.left = cx + 'px';
+                    popup.style.top = top + 'px';
+                    arrow.style.left = cx + 'px';
+                    arrow.style.top = (rect.bottom - 2) + 'px';
+                    
+                    const popRect = popup.getBoundingClientRect();
+                    if (popRect.right > window.innerWidth - 8) {
+                        const shift = popRect.right - window.innerWidth + 8;
+                        popup.style.left = (cx - shift) + 'px';
+                    }
+                    if (popRect.left < 8) {
+                        popup.style.left = (popRect.width / 2 + 8) + 'px';
+                    }
+                });
+                th.addEventListener('mouseleave', () => {
+                    popup.classList.remove('visible');
+                    arrow.classList.remove('visible');
+                });
+            });
+        })();
 
-        // Identifica se está no preview para evitar o erro de "Failed to parse URL"
-        const isPreviewEnv = window.location.protocol !== 'http:' && window.location.protocol !== 'https:';
+        // Identifica se está no preview para evitar o erro de "Failed to parse URL"
+        const isPreviewEnv = window.location.protocol !== 'http:' && window.location.protocol !== 'https:';
 
-        let dadosGlobais = [];
+        let dadosGlobais = [];
 
-        function getDadosFiltrados() {
-            const filtro = document.getElementById('recorrencia-filter').value;
-            if (filtro === 'todos') return dadosGlobais;
-            const val = filtro === 'sim';
-            return dadosGlobais.filter(c => c.recorrencia === val);
-        }
+        function getDadosFiltrados() {
+            const filtro = document.getElementById('recorrencia-filter').value;
+            if (filtro === 'todos') return dadosGlobais;
+            const val = filtro === 'sim';
+            return dadosGlobais.filter(c => c.recorrencia === val);
+        }
 
-        function aplicarFiltroRecorrencia() {
-            const dados = getDadosFiltrados();
-            renderDashboard(dados);
-            atualizarPipelinesDoClienteSelecionado();
-        }
+        function aplicarFiltroRecorrencia() {
+            const dados = getDadosFiltrados();
+            renderDashboard(dados);
+            atualizarPipelinesDoClienteSelecionado();
+        }
 
-        const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+        const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-        // ─── CARREGAR CLIENTES DO SERVIDOR ───
-        async function carregarClientesDropdown() {
-            if (isPreviewEnv) return; // Ignora no preview
+        // ─── CARREGAR CLIENTES DO SERVIDOR ───
+        async function carregarClientesDropdown() {
+            if (isPreviewEnv) return; // Ignora no preview
+            
+            try {
+                const resp = await fetch('/api/clientes');
+                const lista = await resp.json();
+                const sel = document.getElementById('client-selector');
+                lista.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome;
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Erro ao carregar clientes:', e);
+            }
+        }
+
+        // ─── SCROLL FADE LOGIC ───
+        function setupTableScroll() {
+            const scroll = document.getElementById('table-scroll');
+            const fadeL = document.getElementById('fade-left');
+            const fadeR = document.getElementById('fade-right');
+            const hint = document.getElementById('scroll-hint');
+
+            function update() {
+                const { scrollLeft, scrollWidth, clientWidth } = scroll;
+                const maxScroll = scrollWidth - clientWidth;
+                if (maxScroll <= 2) {
+                    fadeL.style.opacity = '0';
+                    fadeR.style.opacity = '0';
+                    return;
+                }
+                fadeL.style.opacity = scrollLeft > 8 ? '1' : '0';
+                fadeR.style.opacity = scrollLeft < maxScroll - 8 ? '1' : '0';
+            }
+
+            scroll.addEventListener('scroll', update, { passive: true });
+            new ResizeObserver(update).observe(scroll);
+
+            setTimeout(() => {
+                if (scroll.scrollWidth > scroll.clientWidth + 10) {
+                    hint.classList.add('visible');
+                }
+            }, 800);
+
+            update();
+        }
+
+        function calculateHealthStatus(client) {
+            if (client.dataDecayLeads >= 5 || client.stagnantLeads >= 15 || client.usersTotal === 0)
+                return { class: 'status-danger', label: 'Em Risco', action: 'Limpar Pipeline Urgente', level: 'danger' };
+            if (client.dataDecayLeads >= 1 || client.stagnantLeads >= 5)
+                return { class: 'status-warning', label: 'Atenção', action: 'Revisar Gargalos', level: 'warning' };
+            return { class: 'status-good', label: 'Saudável', action: 'Tudo OK', level: 'good' };
+        }
+
+        function getCycleClass(days) {
+            if (days === 0) return '';
+            if (days <= 15) return 'cycle-fast';
+            if (days <= 45) return 'cycle-medium';
+            return 'cycle-slow';
+        }
+
+        function renderDashboard(clientesReais) {
+            const tbody = document.querySelector('#clients-table tbody');
+            const billingContainer = document.getElementById('billing-container');
+            tbody.innerHTML = '';
+            billingContainer.innerHTML = '';
+            let healthyCount = 0, warningCount = 0, dangerCount = 0, totalLeads = 0;
+
+            if (!clientesReais || clientesReais.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 48px; color: var(--text-muted);">Nenhum dado encontrado.</td></tr>';
+                billingContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Sem dados de faturamento.</p>';
+                ['total-clients','healthy-clients','risk-clients','danger-clients'].forEach(id => document.getElementById(id).innerText = '0');
+                document.getElementById('total-leads-sub').innerText = '0 leads no CRM';
+                document.getElementById('record-count').innerText = '0 registros';
+                return;
+            }
+
+            clientesReais.forEach(client => {
+                const health = calculateHealthStatus(client);
+                if (health.level === 'good') healthyCount++;
+                else if (health.level === 'warning') warningCount++;
+                else if (health.level === 'danger') dangerCount++;
+                totalLeads += client.leadsLast30Days;
+
+                const estagnadoClass = client.stagnantLeads >= 15 ? 'danger-text' : (client.stagnantLeads > 0 ? 'overdue' : '');
+                const decayClass = client.dataDecayLeads >= 5 ? 'danger-text' : (client.dataDecayLeads > 0 ? 'decay-text' : '');
+                const overdueTaskClass = client.overdueTasks > 10 ? 'danger-text' : (client.overdueTasks > 0 ? 'tasks-overdue-text' : '');
+                const cycleClass = getCycleClass(client.avgSalesCycle);
+                const cycleDisplay = client.avgSalesCycle > 0 ? `${client.avgSalesCycle}d` : '—';
+
+                const recBadge = client.recorrencia
+                    ? '<span class="rec-badge rec-yes">Recorrente</span>'
+                    : '<span class="rec-badge rec-no">Avulso</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${client.name}</strong>${recBadge}</td>
+                    <td><span class="status-badge ${health.class}">${health.label}</span></td>
+                    <td class="finance-text">${formatCurrency(client.wonRevenue || 0)}</td>
+                    <td><span class="cycle-text ${cycleClass}">${cycleDisplay}</span></td>
+                    <td>${client.leadsLast30Days}</td>
+                    <td class="${estagnadoClass}">${client.stagnantLeads}</td>
+                    <td class="${decayClass}">${client.dataDecayLeads}</td>
+                    <td class="${overdueTaskClass}">${client.overdueTasks}</td>
+                    <td><strong>${client.usersTotal}</strong><span class="admin-count">(${client.usersAdmins} Admins)</span></td>
+                    <td><a href="#" class="action-link">${health.action}</a></td>`;
+                tbody.appendChild(tr);
+
+                let billingClass = 'bg-good';
+                if (client.billing.daysRemaining !== null) {
+                    if (client.billing.daysRemaining < 0) billingClass = 'bg-danger';
+                    else if (client.billing.daysRemaining <= 5) billingClass = 'bg-warning';
+                } else { client.billing.statusText = "Data não configurada"; billingClass = 'bg-warning'; }
+
+                const billCard = document.createElement('div');
+                billCard.className = 'billing-card';
+                billCard.innerHTML = `<div class="billing-info"><h4>${client.name}</h4><p>Vencimento: ${client.billing.date}</p></div><div class="billing-status ${billingClass}">${client.billing.statusText}</div>`;
+                billingContainer.appendChild(billCard);
+            });
+
+            document.getElementById('total-clients').innerText = clientesReais.length;
+            document.getElementById('healthy-clients').innerText = healthyCount;
+            document.getElementById('risk-clients').innerText = warningCount;
+            document.getElementById('danger-clients').innerText = dangerCount;
+            document.getElementById('total-leads-sub').innerText = `${totalLeads} leads no CRM`;
+            document.getElementById('record-count').innerText = `${clientesReais.length} registro${clientesReais.length !== 1 ? 's' : ''}`;
+
+            setTimeout(() => {
+                const scroll = document.getElementById('table-scroll');
+                scroll.dispatchEvent(new Event('scroll'));
+            }, 100);
+        }
+
+        // ─── MONTHLY CHART ───
+        function renderMonthlyChart(clientesReais) {
+            const container = document.getElementById('monthly-chart');
+            container.innerHTML = '';
+            const merged = {};
+            clientesReais.forEach(c => {
+                if (!c.monthlyStats) return;
+                c.monthlyStats.forEach(m => {
+                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
+                    merged[m.key].leads += m.leads;
+                    merged[m.key].won += m.won;
+                    merged[m.key].lost += m.lost;
+                });
+            });
+            const months = Object.keys(merged).sort();
+            const recent = months.slice(-12);
+            if (recent.length === 0) { container.innerHTML = '<p class="no-data-msg" style="flex:1;display:flex;align-items:center;justify-content:center;">Sem dados mensais</p>'; return; }
+
+            let maxVal = 0;
+            recent.forEach(k => { maxVal = Math.max(maxVal, merged[k].leads, merged[k].won, merged[k].lost); });
+            if (maxVal === 0) maxVal = 1;
+            const chartH = 260;
+
+            recent.forEach((k, i) => {
+                const m = merged[k];
+                const hL = Math.max(6, (m.leads / maxVal) * chartH);
+                const hW = Math.max(m.won > 0 ? 6 : 0, (m.won / maxVal) * chartH);
+                const hLo = Math.max(m.lost > 0 ? 6 : 0, (m.lost / maxVal) * chartH);
+                const group = document.createElement('div');
+                group.className = 'bar-group';
+                group.innerHTML = `
+                    <div class="bar-stack">
+                        <div class="bar bar-leads" style="height:${hL}px;animation:growBar 0.5s ease ${i*0.06}s both;">
+                            <div class="bar-value" style="color:var(--blue)">${m.leads}</div>
+                        </div>
+                        ${m.won > 0 ? `<div class="bar bar-won" style="height:${hW}px;animation:growBar 0.5s ease ${i*0.06+0.1}s both;"><div class="bar-value" style="color:var(--green)">${m.won}</div></div>` : ''}
+                        ${m.lost > 0 ? `<div class="bar bar-lost" style="height:${hLo}px;animation:growBar 0.5s ease ${i*0.06+0.15}s both;"><div class="bar-value" style="color:var(--primary)">${m.lost}</div></div>` : ''}
+                    </div>
+                    <div class="bar-label">${m.label}</div>`;
+                container.appendChild(group);
+            });
+
+            document.getElementById('chart-client-badge').innerText = clientesReais[0]?.name || 'todos';
+        }
+
+        // ─── LOSS REASONS ───
+        function renderLossReasons(clientesReais) {
+            const container = document.getElementById('loss-reasons-container');
+            container.innerHTML = '';
+            const merged = {};
+            clientesReais.forEach(c => { if (!c.lossReasons) return; c.lossReasons.forEach(lr => { merged[lr.name] = (merged[lr.name] || 0) + lr.count; }); });
+            const entries = Object.entries(merged).sort((a, b) => b[1] - a[1]);
+            const total = entries.reduce((s, [, c]) => s + c, 0);
+            if (entries.length === 0) { container.innerHTML = '<p class="no-data-msg">Nenhum motivo de perda registrado</p>'; return; }
+
+            let html = '<div class="loss-list">';
+            entries.forEach(([name, count], idx) => {
+                const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                html += `<div class="loss-item">
+                    <div class="loss-item-header">
+                        <div class="loss-item-left"><span class="loss-rank ${idx < 3 ? 'top-3' : ''}">${idx + 1}</span><span class="loss-name">${name}</span></div>
+                        <div class="loss-item-right"><span class="loss-count">${count.toLocaleString('pt-BR')}</span><span class="loss-pct">${pct}%</span></div>
+                    </div>
+                    <div class="loss-bar-bg"><div class="loss-bar-fill" style="width:${pct}%"></div></div>
+                </div>`;
+            });
+            html += `<div class="loss-item loss-total-item">
+                <div class="loss-item-header">
+                    <div class="loss-item-left"><span class="loss-total-label">Total</span></div>
+                    <div class="loss-item-right"><span class="loss-count" style="color:var(--text-main);font-size:15px;">${total.toLocaleString('pt-BR')}</span><span class="loss-pct" style="color:var(--text-muted);">100%</span></div>
+                </div>
+            </div>`;
+            html += '</div>';
+            container.innerHTML = html;
+            document.getElementById('loss-client-badge').innerText = clientesReais[0]?.name || 'todos';
+        }
+
+        // ─── CONVERSION RATE CHART ───
+        function renderConversionChart(clientesReais) {
+            const container = document.getElementById('conversion-chart');
+            container.innerHTML = '';
+            const merged = {};
+            clientesReais.forEach(c => {
+                if (!c.monthlyStats) return;
+                c.monthlyStats.forEach(m => {
+                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
+                    merged[m.key].leads += m.leads;
+                    merged[m.key].won += m.won;
+                    merged[m.key].lost += m.lost;
+                });
+            });
+            const months = Object.keys(merged).sort();
+            const recent = months.slice(-12);
+            if (recent.length === 0) {
+                container.innerHTML = '<p class="no-data-msg" style="flex:1;display:flex;align-items:center;justify-content:center;">Sem dados mensais</p>';
+                return;
+            }
+
+            const chartH = 260;
+
+            recent.forEach((k, i) => {
+                const m = merged[k];
+                const total = m.won + m.lost;
+                const wonPct = total > 0 ? (m.won / total) * 100 : 0;
+                const lostPct = total > 0 ? (m.lost / total) * 100 : 0;
+
+                const hW = total > 0 ? Math.max(6, (wonPct / 100) * chartH) : 0;
+                const hL = total > 0 ? Math.max(6, (lostPct / 100) * chartH) : 0;
+
+                const group = document.createElement('div');
+                group.className = 'bar-group';
+
+                if (total === 0) {
+                    group.innerHTML = `
+                        <div class="bar-stack">
+                            <div class="bar" style="height:30px;background:var(--bg-surface);border:1px dashed var(--border-light);border-radius:5px;">
+                                <div class="bar-value" style="color:var(--text-muted)">—</div>
+                            </div>
+                        </div>
+                        <div class="bar-label">${m.label}</div>`;
+                } else {
+                    group.innerHTML = `
+                        <div class="bar-stack">
+                            <div class="bar bar-won" style="height:${hW}px;animation:growBar 0.5s ease ${i*0.06}s both;">
+                                <div class="bar-value" style="color:var(--green)">${wonPct.toFixed(1)}%</div>
+                            </div>
+                            <div class="bar bar-lost" style="height:${hL}px;animation:growBar 0.5s ease ${i*0.06+0.1}s both;">
+                                <div class="bar-value" style="color:var(--primary)">${lostPct.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="bar-label">${m.label}</div>`;
+                }
+                container.appendChild(group);
+            });
+
+            document.getElementById('conversion-client-badge').innerText = clientesReais[0]?.name || 'todos';
+        }
+
+        // ─── FUNNEL ───
+        function getSelectedPipeline() {
+            const cid = document.getElementById('client-selector').value;
+            const pid = parseInt(document.getElementById('pipeline-selector').value);
+            const c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
+            if (c && c.pipelines) return c.pipelines.find(p => p.id === pid) || c.pipelines[0];
+            return null;
+        }
+
+        function atualizarGraficosPorPipeline(pd) {
+            if (!pd) return;
+            const pipelineData = [{ monthlyStats: pd.monthlyStats || [], lossReasons: pd.lossReasons || [], name: pd.name }];
+            renderMonthlyChart(pipelineData);
+            renderLossReasons(pipelineData);
+            renderConversionChart(pipelineData);
+        }
+
+        function atualizarPipelinesDoClienteSelecionado() {
+            const cid = document.getElementById('client-selector').value;
+            const sel = document.getElementById('pipeline-selector');
+            sel.innerHTML = '';
+            if (!dadosGlobais || dadosGlobais.length === 0) { sel.innerHTML = '<option value="">Sem dados</option>'; return; }
+            let c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
+            if (c && c.pipelines) {
+                document.getElementById('funnel-title').innerText = `Detalhes do Funil: ${c.name}`;
+                c.pipelines.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.text = p.name; sel.appendChild(o); });
+                renderFunnel(c.pipelines[0]);
+                atualizarGraficosPorPipeline(c.pipelines[0]);
+            } else { sel.innerHTML = '<option value="">Nenhum funil</option>'; document.getElementById('funnel-stages-container').innerHTML = ''; }
+        }
+
+        function renderFunnel(pd) {
+            if (!pd) return;
+            const container = document.getElementById('funnel-stages-container');
+            container.innerHTML = '';
+            let acum = pd.results.won;
+            const etapas = [];
+            for (let i = pd.stages.length - 1; i >= 0; i--) { acum += pd.stages[i].count; etapas.unshift({ ...pd.stages[i], passaram: acum }); }
+
+            etapas.forEach((stage, idx) => {
+                if (idx > 0) {
+                    const ant = etapas[idx - 1];
+                    let rate = ant.passaram === 0 ? 0 : ((stage.passaram / ant.passaram) * 100).toFixed(1);
+                    container.insertAdjacentHTML('beforeend', `<div class="conversion-arrow"><span>${rate}%</span><div class="arrow-icon">›››</div></div>`);
+                }
+                container.insertAdjacentHTML('beforeend', `<div class="funnel-stage"><h4>${stage.name}</h4><div class="count">${stage.count}</div><div class="time-in-stage">⏱ ${stage.avgDays}d média</div></div>`);
+            });
+
+            const decided = pd.results.won + pd.results.lost;
+            const wonP = decided === 0 ? 0 : ((pd.results.won / decided) * 100).toFixed(1);
+            const lostP = decided === 0 ? 0 : ((pd.results.lost / decided) * 100).toFixed(1);
+            document.getElementById('funnel-won-count').innerText = pd.results.won;
+            document.getElementById('funnel-won-percent').innerText = `${wonP}% de conversão`;
+            document.getElementById('funnel-lost-count').innerText = pd.results.lost;
+            document.getElementById('funnel-lost-percent').innerText = `${lostP}% de perda`;
+        }
+
+        // ─── GERAÇÃO DO ONE PAGE REPORT IDÊNTICO ÀS IMAGENS DA V4 ───
+        function gerarOnePageReport() {
+            const cid = document.getElementById('client-selector').value;
             
-            try {
-                const resp = await fetch('/api/clientes');
-                const lista = await resp.json();
-                const sel = document.getElementById('client-selector');
-                lista.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.nome;
-                    sel.appendChild(opt);
-                });
-            } catch (e) {
-                console.error('Erro ao carregar clientes:', e);
-            }
-        }
-
-        // ─── SCROLL FADE LOGIC ───
-        function setupTableScroll() {
-            const scroll = document.getElementById('table-scroll');
-            const fadeL = document.getElementById('fade-left');
-            const fadeR = document.getElementById('fade-right');
-            const hint = document.getElementById('scroll-hint');
-
-            function update() {
-                const { scrollLeft, scrollWidth, clientWidth } = scroll;
-                const maxScroll = scrollWidth - clientWidth;
-                if (maxScroll <= 2) {
-                    fadeL.style.opacity = '0';
-                    fadeR.style.opacity = '0';
-                    return;
-                }
-                fadeL.style.opacity = scrollLeft > 8 ? '1' : '0';
-                fadeR.style.opacity = scrollLeft < maxScroll - 8 ? '1' : '0';
-            }
-
-            scroll.addEventListener('scroll', update, { passive: true });
-            new ResizeObserver(update).observe(scroll);
-
-            setTimeout(() => {
-                if (scroll.scrollWidth > scroll.clientWidth + 10) {
-                    hint.classList.add('visible');
-                }
-            }, 800);
-
-            update();
-        }
-
-        function calculateHealthStatus(client) {
-            if (client.dataDecayLeads >= 5 || client.stagnantLeads >= 15 || client.usersTotal === 0)
-                return { class: 'status-danger', label: 'Em Risco', action: 'Limpar Pipeline Urgente', level: 'danger' };
-            if (client.dataDecayLeads >= 1 || client.stagnantLeads >= 5)
-                return { class: 'status-warning', label: 'Atenção', action: 'Revisar Gargalos', level: 'warning' };
-            return { class: 'status-good', label: 'Saudável', action: 'Tudo OK', level: 'good' };
-        }
-
-        function getCycleClass(days) {
-            if (days === 0) return '';
-            if (days <= 15) return 'cycle-fast';
-            if (days <= 45) return 'cycle-medium';
-            return 'cycle-slow';
-        }
-
-        function renderDashboard(clientesReais) {
-            const tbody = document.querySelector('#clients-table tbody');
-            const billingContainer = document.getElementById('billing-container');
-            tbody.innerHTML = '';
-            billingContainer.innerHTML = '';
-            let healthyCount = 0, warningCount = 0, dangerCount = 0, totalLeads = 0;
-
-            if (!clientesReais || clientesReais.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 48px; color: var(--text-muted);">Nenhum dado encontrado.</td></tr>';
-                billingContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Sem dados de faturamento.</p>';
-                ['total-clients','healthy-clients','risk-clients','danger-clients'].forEach(id => document.getElementById(id).innerText = '0');
-                document.getElementById('total-leads-sub').innerText = '0 leads no CRM';
-                document.getElementById('record-count').innerText = '0 registros';
+            let cliente = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
+            
+            if (!cliente) {
+                alert("Por favor, selecione um cliente ou atualize os dados primeiro.");
                 return;
             }
 
-            clientesReais.forEach(client => {
-                const health = calculateHealthStatus(client);
-                if (health.level === 'good') healthyCount++;
-                else if (health.level === 'warning') warningCount++;
-                else if (health.level === 'danger') dangerCount++;
-                totalLeads += client.leadsLast30Days;
+            const dataInicio = document.getElementById('date-start').value || "Início";
+            const dataFim = document.getElementById('date-end').value || "Hoje";
+            const periodoStr = dataInicio !== "Início" ? `${dataInicio} até ${dataFim}` : "Todo Período";
 
-                const estagnadoClass = client.stagnantLeads >= 15 ? 'danger-text' : (client.stagnantLeads > 0 ? 'overdue' : '');
-                const decayClass = client.dataDecayLeads >= 5 ? 'danger-text' : (client.dataDecayLeads > 0 ? 'decay-text' : '');
-                const overdueTaskClass = client.overdueTasks > 10 ? 'danger-text' : (client.overdueTasks > 0 ? 'tasks-overdue-text' : '');
-                const cycleClass = getCycleClass(client.avgSalesCycle);
-                const cycleDisplay = client.avgSalesCycle > 0 ? `${client.avgSalesCycle}d` : '—';
+            // Cálculos
+            const leadsTotais = cliente.leadsLast30Days || 0;
+            const vendas = cliente.pipelines?.[0]?.results?.won || 0;
+            const perdas = cliente.pipelines?.[0]?.results?.lost || 0;
+            const receita = cliente.wonRevenue || 0;
+            const totalDecididos = vendas + perdas;
+            const taxaConversao = totalDecididos > 0 ? (vendas / totalDecididos * 100).toFixed(1) : 0;
+            const taxaPerda = totalDecididos > 0 ? (perdas / totalDecididos * 100).toFixed(1) : 0;
+            const ciclo = cliente.avgSalesCycle || 0;
+            const estagnados = cliente.stagnantLeads || 0;
 
-                const recBadge = client.recorrencia
-                    ? '<span class="rec-badge rec-yes">Recorrente</span>'
-                    : '<span class="rec-badge rec-no">Avulso</span>';
+            // Inteligência da Nota (Score)
+            let nota = 5;
+            let badgeColor = 'bg-green-500 text-white';
+            let statusText = 'Saudável — Recorrente';
+            let statusDot = 'bg-green-500';
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${client.name}</strong>${recBadge}</td>
-                    <td><span class="status-badge ${health.class}">${health.label}</span></td>
-                    <td class="finance-text">${formatCurrency(client.wonRevenue || 0)}</td>
-                    <td><span class="cycle-text ${cycleClass}">${cycleDisplay}</span></td>
-                    <td>${client.leadsLast30Days}</td>
-                    <td class="${estagnadoClass}">${client.stagnantLeads}</td>
-                    <td class="${decayClass}">${client.dataDecayLeads}</td>
-                    <td class="${overdueTaskClass}">${client.overdueTasks}</td>
-                    <td><strong>${client.usersTotal}</strong><span class="admin-count">(${client.usersAdmins} Admins)</span></td>
-                    <td><a href="#" class="action-link">${health.action}</a></td>`;
-                tbody.appendChild(tr);
+            if (taxaConversao >= 30 && ciclo <= 15) {
+                nota = Math.min(10, 7 + (taxaConversao > 40 ? 1 : 0));
+                badgeColor = 'bg-green-500 text-white';
+                statusText = 'Saudável — Recorrente';
+                statusDot = 'bg-green-500';
+            } else if (taxaPerda > 60 || ciclo > 45) {
+                nota = Math.max(1, 4 - (taxaPerda > 80 ? 1 : 0));
+                badgeColor = 'bg-red-500 text-white';
+                statusText = 'Risco Alto — Revisão Urgente';
+                statusDot = 'bg-red-500';
+            } else {
+                nota = 6;
+                badgeColor = 'bg-yellow-500 text-black';
+                statusText = 'Atenção — Oportunidade de Otimização';
+                statusDot = 'bg-yellow-500';
+            }
 
-                let billingClass = 'bg-good';
-                if (client.billing.daysRemaining !== null) {
-                    if (client.billing.daysRemaining < 0) billingClass = 'bg-danger';
-                    else if (client.billing.daysRemaining <= 5) billingClass = 'bg-warning';
-                } else { client.billing.statusText = "Data não configurada"; billingClass = 'bg-warning'; }
+            // Geração Inteligente da Leitura Estratégica
+            let leituraEstrategica = `<p class="text-gray-400 text-sm leading-relaxed mb-4">A operação da ${cliente.name} acumulou ${leadsTotais} leads no CRM no período, gerando ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(receita)} em receita com ${vendas} vendas realizadas e um ciclo de fechamento de ${ciclo} dias.</p>`;
+            
+            if (taxaPerda >= 50) {
+                leituraEstrategica += `<p class="text-gray-400 text-sm leading-relaxed mb-4">Apesar do volume de oportunidades geradas, a taxa de perda de ${taxaPerda}% é o principal ponto de atenção no funil atual, sugerindo problemas no momento de follow-up ou leads fora de perfil preenchendo a base de aquisição.</p>`;
+            } else {
+                leituraEstrategica += `<p class="text-gray-400 text-sm leading-relaxed mb-4">A operação está sustentando uma excelente taxa de conversão de ${taxaConversao}%. O foco central agora deve ser escalar as campanhas de marketing de entrada mantendo essa mesma eficiência qualitativa.</p>`;
+            }
 
-                const billCard = document.createElement('div');
-                billCard.className = 'billing-card';
-                billCard.innerHTML = `<div class="billing-info"><h4>${client.name}</h4><p>Vencimento: ${client.billing.date}</p></div><div class="billing-status ${billingClass}">${client.billing.statusText}</div>`;
-                billingContainer.appendChild(billCard);
-            });
+            if (estagnados > 0) {
+                leituraEstrategica += `<p class="text-gray-400 text-sm leading-relaxed">O funil também aponta para ${estagnados} leads estagnados. Esse bolso de oportunidades precisa de ação de cadência ativa ou descarte definitivo para manter a higiene do CRM.</p>`;
+            }
 
-            document.getElementById('total-clients').innerText = clientesReais.length;
-            document.getElementById('healthy-clients').innerText = healthyCount;
-            document.getElementById('risk-clients').innerText = warningCount;
-            document.getElementById('danger-clients').innerText = dangerCount;
-            document.getElementById('total-leads-sub').innerText = `${totalLeads} leads no CRM`;
-            document.getElementById('record-count').innerText = `${clientesReais.length} registro${clientesReais.length !== 1 ? 's' : ''}`;
+            // Motivos de perda em HTML com Barras de Progresso Vermelhas
+            let motivosPerdaHTML = '';
+            let planoAcaoHTML = '';
+            let usaMotivoGenerico = false;
 
-            setTimeout(() => {
-                const scroll = document.getElementById('table-scroll');
-                scroll.dispatchEvent(new Event('scroll'));
-            }, 100);
-        }
-
-        // ─── MONTHLY CHART ───
-        function renderMonthlyChart(clientesReais) {
-            const container = document.getElementById('monthly-chart');
-            container.innerHTML = '';
-            const merged = {};
-            clientesReais.forEach(c => {
-                if (!c.monthlyStats) return;
-                c.monthlyStats.forEach(m => {
-                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
-                    merged[m.key].leads += m.leads;
-                    merged[m.key].won += m.won;
-                    merged[m.key].lost += m.lost;
-                });
-            });
-            const months = Object.keys(merged).sort();
-            const recent = months.slice(-12);
-            if (recent.length === 0) { container.innerHTML = '<p class="no-data-msg" style="flex:1;display:flex;align-items:center;justify-content:center;">Sem dados mensais</p>'; return; }
-
-            let maxVal = 0;
-            recent.forEach(k => { maxVal = Math.max(maxVal, merged[k].leads, merged[k].won, merged[k].lost); });
-            if (maxVal === 0) maxVal = 1;
-            const chartH = 260;
-
-            recent.forEach((k, i) => {
-                const m = merged[k];
-                const hL = Math.max(6, (m.leads / maxVal) * chartH);
-                const hW = Math.max(m.won > 0 ? 6 : 0, (m.won / maxVal) * chartH);
-                const hLo = Math.max(m.lost > 0 ? 6 : 0, (m.lost / maxVal) * chartH);
-                const group = document.createElement('div');
-                group.className = 'bar-group';
-                group.innerHTML = `
-                    <div class="bar-stack">
-                        <div class="bar bar-leads" style="height:${hL}px;animation:growBar 0.5s ease ${i*0.06}s both;">
-                            <div class="bar-value" style="color:var(--blue)">${m.leads}</div>
+            if (cliente.pipelines?.[0]?.lossReasons && cliente.pipelines[0].lossReasons.length > 0) {
+                const lossData = [...cliente.pipelines[0].lossReasons].sort((a,b) => b.count - a.count);
+                const totalPerdasVal = lossData.reduce((acc, curr) => acc + curr.count, 0);
+                
+                motivosPerdaHTML = lossData.map((motivo, index) => {
+                    const pct = totalPerdasVal > 0 ? ((motivo.count / totalPerdasVal) * 100).toFixed(1) : 0;
+                    if (motivo.name.toLowerCase().includes("sem motivo") && pct > 15) usaMotivoGenerico = true;
+                    
+                    return `
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-red-500/20 text-red-500 text-xs font-bold w-6 h-6 flex items-center justify-center rounded">${index + 1}</span>
+                                <span class="text-gray-200 text-sm font-medium">${motivo.name}</span>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm font-mono">
+                                <span class="text-red-500 font-bold">${motivo.count}</span>
+                                <span class="text-gray-500">${pct}%</span>
+                            </div>
                         </div>
-                        ${m.won > 0 ? `<div class="bar bar-won" style="height:${hW}px;animation:growBar 0.5s ease ${i*0.06+0.1}s both;"><div class="bar-value" style="color:var(--green)">${m.won}</div></div>` : ''}
-                        ${m.lost > 0 ? `<div class="bar bar-lost" style="height:${hLo}px;animation:growBar 0.5s ease ${i*0.06+0.15}s both;"><div class="bar-value" style="color:var(--primary)">${m.lost}</div></div>` : ''}
+                        <div class="w-full bg-[#1e1e1e] h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-red-500 h-full rounded-full" style="width: ${pct}%"></div>
+                        </div>
                     </div>
-                    <div class="bar-label">${m.label}</div>`;
-                container.appendChild(group);
-            });
+                    `;
+                }).join('');
 
-            document.getElementById('chart-client-badge').innerText = clientesReais[0]?.name || 'todos';
-        }
+                // Montar o Plano de Ação Dinâmico
+                if (usaMotivoGenerico) {
+                    planoAcaoHTML += `
+                    <div class="border border-yellow-500/30 bg-[#1a1505] rounded-xl p-6 mb-4 border-l-4 border-l-yellow-500">
+                        <span class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3 inline-block">Importante</span>
+                        <h4 class="text-lg font-bold text-white mb-2">Reduzir Uso do Motivo Genérico "Sem Motivo Registrado"</h4>
+                        <p class="text-gray-400 text-sm mb-4">Treinar a equipe para classificar perdas nos motivos específicos disponíveis no CRM. Avaliar se as categorias atuais cobrem todos os cenários reais e auditar semanalmente.</p>
+                        <div class="bg-black/40 border border-yellow-500/20 p-3 rounded-lg">
+                            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Resultado Esperado</p>
+                            <p class="text-yellow-500 text-sm font-medium">Reduzir "Sem motivo registrado" para menos de 10%, viabilizando análises precisas no funil.</p>
+                        </div>
+                    </div>`;
+                }
 
-        // ─── LOSS REASONS ───
-        function renderLossReasons(clientesReais) {
-            const container = document.getElementById('loss-reasons-container');
-            container.innerHTML = '';
-            const merged = {};
-            clientesReais.forEach(c => { if (!c.lossReasons) return; c.lossReasons.forEach(lr => { merged[lr.name] = (merged[lr.name] || 0) + lr.count; }); });
-            const entries = Object.entries(merged).sort((a, b) => b[1] - a[1]);
-            const total = entries.reduce((s, [, c]) => s + c, 0);
-            if (entries.length === 0) { container.innerHTML = '<p class="no-data-msg">Nenhum motivo de perda registrado</p>'; return; }
+                if (estagnados > 0) {
+                    planoAcaoHTML += `
+                    <div class="border border-green-500/30 bg-[#0a1a10] rounded-xl p-6 mb-4 border-l-4 border-l-green-500">
+                        <span class="bg-green-500 text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3 inline-block">Melhoria</span>
+                        <h4 class="text-lg font-bold text-white mb-2">Limpar e Reativar Leads Estagnados</h4>
+                        <p class="text-gray-400 text-sm mb-4">Criar fluxo de reativação para os ${estagnados} leads sem interação. Definir SLA para descarte automático e cadência de tentativas de contato antes da perda.</p>
+                        <div class="bg-black/40 border border-green-500/20 p-3 rounded-lg">
+                            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Resultado Esperado</p>
+                            <p class="text-green-500 text-sm font-medium">Recuperar pelo menos 10% dos leads estagnados e higienizar o CRM.</p>
+                        </div>
+                    </div>`;
+                }
+            }
 
-            let html = '<div class="loss-list">';
-            entries.forEach(([name, count], idx) => {
-                const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-                html += `<div class="loss-item">
-                    <div class="loss-item-header">
-                        <div class="loss-item-left"><span class="loss-rank ${idx < 3 ? 'top-3' : ''}">${idx + 1}</span><span class="loss-name">${name}</span></div>
-                        <div class="loss-item-right"><span class="loss-count">${count.toLocaleString('pt-BR')}</span><span class="loss-pct">${pct}%</span></div>
-                    </div>
-                    <div class="loss-bar-bg"><div class="loss-bar-fill" style="width:${pct}%"></div></div>
+            // Fallback caso não haja plano de ação gerado
+            if(planoAcaoHTML === '') {
+                planoAcaoHTML = `
+                <div class="border border-blue-500/30 bg-[#0a121a] rounded-xl p-6 mb-4 border-l-4 border-l-blue-500">
+                    <span class="bg-blue-500 text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3 inline-block">Tração</span>
+                    <h4 class="text-lg font-bold text-white mb-2">Escalar Geração de Leads</h4>
+                    <p class="text-gray-400 text-sm mb-4">A operação encontra-se estável e sem gargalos críticos aparentes no preenchimento de CRM. Injetar volume topo de funil.</p>
                 </div>`;
-            });
-            html += `<div class="loss-item loss-total-item">
-                <div class="loss-item-header">
-                    <div class="loss-item-left"><span class="loss-total-label">Total</span></div>
-                    <div class="loss-item-right"><span class="loss-count" style="color:var(--text-main);font-size:15px;">${total.toLocaleString('pt-BR')}</span><span class="loss-pct" style="color:var(--text-muted);">100%</span></div>
+            }
+
+            const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Relatório de Saúde CRM - V4 Company</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Outfit', sans-serif; background-color: #0d0d0d; color: #ffffff; }
+                    .font-mono { font-family: 'JetBrains Mono', monospace; }
+                    .card { background-color: #141414; border: 1px solid #262626; border-radius: 12px; }
+                </style>
+            </head>
+            <body class="p-8 max-w-5xl mx-auto">
+                
+                <header class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
+                    <div class="flex items-center gap-4">
+                        <h1 class="text-2xl font-black text-red-600 tracking-tighter">V4 COMPANY</h1>
+                        <span class="border border-gray-700 bg-[#1a1a1a] text-gray-300 text-xs px-3 py-1 rounded-full">Operação: ${cliente.name}</span>
+                        <span class="border border-gray-700 bg-[#1a1a1a] text-gray-300 text-xs px-3 py-1 rounded-full">${periodoStr}</span>
+                    </div>
+                </header>
+
+                <h2 class="text-3xl font-bold mb-8">Relatório de Saúde CRM</h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="card p-6">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Total de Leads</p>
+                        <p class="text-3xl font-bold font-mono text-white">${leadsTotais}</p>
+                        <p class="text-xs text-gray-500 mt-2">Cadastrados no CRM</p>
+                    </div>
+                    <div class="card p-6">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Vendas Realizadas</p>
+                        <p class="text-3xl font-bold font-mono text-green-500">${vendas}</p>
+                        <p class="text-xs text-gray-500 mt-2">${taxaConversao}% de conversão</p>
+                    </div>
+                    <div class="card p-6">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Negócios Perdidos</p>
+                        <p class="text-3xl font-bold font-mono text-red-500">${perdas}</p>
+                        <p class="text-xs text-gray-500 mt-2">${taxaPerda}% de perda</p>
+                    </div>
+                    <div class="card p-6">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Receita Gerada</p>
+                        <p class="text-3xl font-bold font-mono text-green-500">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(receita)}</p>
+                        <p class="text-xs text-gray-500 mt-2">Ciclo médio de ${ciclo} dias</p>
+                    </div>
                 </div>
-            </div>`;
-            html += '</div>';
-            container.innerHTML = html;
-            document.getElementById('loss-client-badge').innerText = clientesReais[0]?.name || 'todos';
-        }
 
-        // ─── CONVERSION RATE CHART ───
-        function renderConversionChart(clientesReais) {
-            const container = document.getElementById('conversion-chart');
-            container.innerHTML = '';
-            const merged = {};
-            clientesReais.forEach(c => {
-                if (!c.monthlyStats) return;
-                c.monthlyStats.forEach(m => {
-                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
-                    merged[m.key].leads += m.leads;
-                    merged[m.key].won += m.won;
-                    merged[m.key].lost += m.lost;
-                });
-            });
-            const months = Object.keys(merged).sort();
-            const recent = months.slice(-12);
-            if (recent.length === 0) {
-                container.innerHTML = '<p class="no-data-msg" style="flex:1;display:flex;align-items:center;justify-content:center;">Sem dados mensais</p>';
-                return;
-            }
+                <div class="card p-8 mb-10">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 class="text-xl font-bold">Avaliação de Saúde do CRM</h3>
+                        <div class="${badgeColor} px-4 py-2 rounded-lg font-bold font-mono text-xl">${nota}/10</div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-2.5 h-2.5 rounded-full ${statusDot}"></span>
+                        <span class="text-sm font-semibold text-green-400">${statusText}</span>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-4">
+                        <strong>Objetivo:</strong> Monitorar a eficiência do funil de vendas, identificar gargalos operacionais e maximizar a conversão de leads da ${cliente.name}.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        A operação apresenta um volume de geração de leads de ${leadsTotais} registros e ciclo de vendas avaliado em (${ciclo}d). A taxa de conversão atual é de ${taxaConversao}%. É crucial acompanhar o volume de ${estagnados} leads estagnados para otimizar os esforços do time.
+                    </p>
+                </div>
 
-            const chartH = 260;
+                <div class="grid grid-cols-1 mb-10">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Vitórias do Período</h3>
+                    <div class="card p-6 border border-green-500/20 mb-6">
+                        <h4 class="font-bold text-sm text-white mb-1">Ciclo de Vendas Consolidado: <span class="text-green-500">${ciclo} dias</span></h4>
+                        <p class="text-xs text-gray-400">O ciclo médio de fechamento aponta para um processo de decisão comercial e operação bem ajustados.</p>
+                    </div>
 
-            recent.forEach((k, i) => {
-                const m = merged[k];
-                const total = m.won + m.lost;
-                const wonPct = total > 0 ? (m.won / total) * 100 : 0;
-                const lostPct = total > 0 ? (m.lost / total) * 100 : 0;
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full"></span> Oportunidades</h3>
+                    <div class="card p-6 border border-red-500/20 mb-6">
+                        <h4 class="font-bold text-sm text-white mb-1">Taxa de Perda Crítica: <span class="text-red-500">${taxaPerda}%</span></h4>
+                        <p class="text-xs text-gray-400 mb-2">Um volume representativo de negócios resulta em perda. O absoluto de ${perdas} perdas demanda atenção na qualificação.</p>
+                    </div>
+                    ${estagnados > 0 ? `
+                    <div class="card p-6 border border-yellow-500/20">
+                        <h4 class="font-bold text-sm text-white mb-1">Leads Sem Resposta: <span class="text-yellow-500">${estagnados} leads</span></h4>
+                        <p class="text-xs text-gray-400">Existem oportunidades paradas que precisam ser reativadas ou descartadas para manter as métricas de CRM reais.</p>
+                    </div>` : ''}
+                </div>
 
-                const hW = total > 0 ? Math.max(6, (wonPct / 100) * chartH) : 0;
-                const hL = total > 0 ? Math.max(6, (lostPct / 100) * chartH) : 0;
-
-                const group = document.createElement('div');
-                group.className = 'bar-group';
-
-                if (total === 0) {
-                    group.innerHTML = `
-                        <div class="bar-stack">
-                            <div class="bar" style="height:30px;background:var(--bg-surface);border:1px dashed var(--border-light);border-radius:5px;">
-                                <div class="bar-value" style="color:var(--text-muted)">—</div>
-                            </div>
+                <div class="grid md:grid-cols-2 gap-8 mb-10">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Leitura Estratégica</h3>
+                        <div class="mb-8">
+                            ${leituraEstrategica}
                         </div>
-                        <div class="bar-label">${m.label}</div>`;
-                } else {
-                    group.innerHTML = `
-                        <div class="bar-stack">
-                            <div class="bar bar-won" style="height:${hW}px;animation:growBar 0.5s ease ${i*0.06}s both;">
-                                <div class="bar-value" style="color:var(--green)">${wonPct.toFixed(1)}%</div>
-                            </div>
-                            <div class="bar bar-lost" style="height:${hL}px;animation:growBar 0.5s ease ${i*0.06+0.1}s both;">
-                                <div class="bar-value" style="color:var(--primary)">${lostPct.toFixed(1)}%</div>
-                            </div>
+                        
+                        <h3 class="text-xl font-bold mb-4">Plano de Ação Executivo</h3>
+                        <div class="card p-6 border-red-500/30 border-l-4 border-l-red-500 mb-6">
+                            <p class="text-sm text-gray-300">
+                                <strong>Diagnóstico:</strong> A operação possui velocidade, mas a eficiência global é afetada pela taxa de perda e gestão da base de contatos inativos. A conversão pode ser elevada com disciplina de categorização e fluxos de follow-up.
+                            </p>
                         </div>
-                        <div class="bar-label">${m.label}</div>`;
-                }
-                container.appendChild(group);
-            });
+                        ${planoAcaoHTML}
+                    </div>
 
-            document.getElementById('conversion-client-badge').innerText = clientesReais[0]?.name || 'todos';
+                    <div class="card p-8 h-fit">
+                        <h3 class="text-xl font-bold mb-6 border-l-2 border-red-500 pl-3">Motivos de Perda</h3>
+                        <div class="pr-2">
+                            ${motivosPerdaHTML || '<p class="text-gray-500 text-sm">Sem motivos de perda listados para este filtro.</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-8 flex justify-between items-center bg-[#0a0a0a] border-gray-800">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold mb-1">Métrica Chave</p>
+                        <p class="text-2xl font-bold text-white">${taxaConversao}% Conversão</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-500 uppercase font-bold mb-1">Desenvolvido via API CRM</p>
+                        <p class="text-sm text-gray-400">V4 Company Customer Success</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            `;
+
+            // Exportação do Arquivo HTML
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `V4_OnePageReport_${cliente.name.replace(/\s+/g, '_')}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
-        // ─── FUNNEL ───
-        function getSelectedPipeline() {
-            const cid = document.getElementById('client-selector').value;
-            const pid = parseInt(document.getElementById('pipeline-selector').value);
-            const c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
-            if (c && c.pipelines) return c.pipelines.find(p => p.id === pid) || c.pipelines[0];
-            return null;
-        }
+        // ─── API FETCH ───
+        async function buscarDadosDaApi(dataInicioStr = '', dataFimStr = '') {
+            try {
+                const tbody = document.querySelector('#clients-table tbody');
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 48px; color: var(--text-muted);"><div style="display:inline-block;width:18px;height:18px;border:2px solid var(--border-light);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;margin-right:10px;vertical-align:middle;"></div>Analisando API do Kommo...</td></tr>';
+                document.getElementById('btn-update').innerText = 'Calculando...';
 
-        function atualizarGraficosPorPipeline(pd) {
-            if (!pd) return;
-            const pipelineData = [{ monthlyStats: pd.monthlyStats || [], lossReasons: pd.lossReasons || [], name: pd.name }];
-            renderMonthlyChart(pipelineData);
-            renderLossReasons(pipelineData);
-            renderConversionChart(pipelineData);
-        }
+                // Interrompe o fetch se estiver no preview para evitar o crash de URL
+                if (isPreviewEnv) {
+                    tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-main); text-align: center; padding: 48px; background: rgba(255,255,255,0.02); border-radius: 8px;"><strong>⚠️ Ambiente de Visualização:</strong> O design está pronto! Rode este HTML junto com o seu arquivo <code>server.js</code> (localhost) para visualizar os dados reais da API.</td></tr>`;
+                    document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
+                    return;
+                }
 
-        function atualizarPipelinesDoClienteSelecionado() {
-            const cid = document.getElementById('client-selector').value;
-            const sel = document.getElementById('pipeline-selector');
-            sel.innerHTML = '';
-            if (!dadosGlobais || dadosGlobais.length === 0) { sel.innerHTML = '<option value="">Sem dados</option>'; return; }
-            let c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
-            if (c && c.pipelines) {
-                document.getElementById('funnel-title').innerText = `Detalhes do Funil: ${c.name}`;
-                c.pipelines.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.text = p.name; sel.appendChild(o); });
-                renderFunnel(c.pipelines[0]);
-                atualizarGraficosPorPipeline(c.pipelines[0]);
-            } else { sel.innerHTML = '<option value="">Nenhum funil</option>'; document.getElementById('funnel-stages-container').innerHTML = ''; }
-        }
+                const clienteId = document.getElementById('client-selector').value;
+                const params = new URLSearchParams();
+                params.append('clienteId', clienteId);
+                if (dataInicioStr) params.append('inicio', Math.floor(new Date(`${dataInicioStr}T00:00:00`).getTime() / 1000));
+                if (dataFimStr) params.append('fim', Math.floor(new Date(`${dataFimStr}T23:59:59`).getTime() / 1000));
 
-        function renderFunnel(pd) {
-            if (!pd) return;
-            const container = document.getElementById('funnel-stages-container');
-            container.innerHTML = '';
-            let acum = pd.results.won;
-            const etapas = [];
-            for (let i = pd.stages.length - 1; i >= 0; i--) { acum += pd.stages[i].count; etapas.unshift({ ...pd.stages[i], passaram: acum }); }
+                const response = await fetch(`/api/dados-dashboard?${params.toString()}`);
+                if (!response.ok) throw new Error("Erro na resposta do servidor");
 
-            etapas.forEach((stage, idx) => {
-                if (idx > 0) {
-                    const ant = etapas[idx - 1];
-                    let rate = ant.passaram === 0 ? 0 : ((stage.passaram / ant.passaram) * 100).toFixed(1);
-                    container.insertAdjacentHTML('beforeend', `<div class="conversion-arrow"><span>${rate}%</span><div class="arrow-icon">›››</div></div>`);
-                }
-                container.insertAdjacentHTML('beforeend', `<div class="funnel-stage"><h4>${stage.name}</h4><div class="count">${stage.count}</div><div class="time-in-stage">⏱ ${stage.avgDays}d média</div></div>`);
-            });
+                dadosGlobais = await response.json();
+                const dados = getDadosFiltrados();
+                renderDashboard(dados);
+                atualizarPipelinesDoClienteSelecionado();
+            } catch (error) {
+                console.error("Erro Fatal:", error);
+                document.querySelector('#clients-table tbody').innerHTML = `<tr><td colspan="10" style="color: var(--primary); text-align: center; padding: 48px;"><strong>ERRO:</strong> Não foi possível conectar ao servidor.</td></tr>`;
+            } finally {
+                document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
+            }
+        }
 
-            const decided = pd.results.won + pd.results.lost;
-            const wonP = decided === 0 ? 0 : ((pd.results.won / decided) * 100).toFixed(1);
-            const lostP = decided === 0 ? 0 : ((pd.results.lost / decided) * 100).toFixed(1);
-            document.getElementById('funnel-won-count').innerText = pd.results.won;
-            document.getElementById('funnel-won-percent').innerText = `${wonP}% de conversão`;
-            document.getElementById('funnel-lost-count').innerText = pd.results.lost;
-            document.getElementById('funnel-lost-percent').innerText = `${lostP}% de perda`;
-        }
+        // ─── EVENTS ───
+        document.getElementById('btn-export-view').addEventListener('click', gerarOnePageReport);
+        document.getElementById('btn-all-time').addEventListener('click', () => { document.getElementById('date-start').value = ''; document.getElementById('date-end').value = ''; buscarDadosDaApi(); });
+        document.getElementById('btn-update').addEventListener('click', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
+        document.getElementById('client-selector').addEventListener('change', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
+        document.getElementById('recorrencia-filter').addEventListener('change', () => { aplicarFiltroRecorrencia(); });
+        document.getElementById('pipeline-selector').addEventListener('change', (e) => {
+            const cid = document.getElementById('client-selector').value;
+            const c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
+            if (c && c.pipelines) {
+                const p = c.pipelines.find(p => p.id === parseInt(e.target.value));
+                if (p) { renderFunnel(p); atualizarGraficosPorPipeline(p); }
+            }
+        });
 
-        // ─── API FETCH ───
-        async function buscarDadosDaApi(dataInicioStr = '', dataFimStr = '') {
-            try {
-                const tbody = document.querySelector('#clients-table tbody');
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 48px; color: var(--text-muted);"><div style="display:inline-block;width:18px;height:18px;border:2px solid var(--border-light);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;margin-right:10px;vertical-align:middle;"></div>Analisando API do Kommo...</td></tr>';
-                document.getElementById('btn-update').innerText = 'Calculando...';
-
-                // Interrompe o fetch se estiver no preview para evitar o crash de URL
-                if (isPreviewEnv) {
-                    tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-main); text-align: center; padding: 48px; background: rgba(255,255,255,0.02); border-radius: 8px;"><strong>⚠️ Ambiente de Visualização:</strong> O design está pronto! Rode este HTML junto com o seu arquivo <code>server.js</code> (localhost) para visualizar os dados reais da API.</td></tr>`;
-                    document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
-                    return;
-                }
-
-                const clienteId = document.getElementById('client-selector').value;
-                const params = new URLSearchParams();
-                params.append('clienteId', clienteId);
-                if (dataInicioStr) params.append('inicio', Math.floor(new Date(`${dataInicioStr}T00:00:00`).getTime() / 1000));
-                if (dataFimStr) params.append('fim', Math.floor(new Date(`${dataFimStr}T23:59:59`).getTime() / 1000));
-
-                const response = await fetch(`/api/dados-dashboard?${params.toString()}`);
-                if (!response.ok) throw new Error("Erro na resposta do servidor");
-
-                dadosGlobais = await response.json();
-                const dados = getDadosFiltrados();
-                renderDashboard(dados);
-                atualizarPipelinesDoClienteSelecionado();
-            } catch (error) {
-                console.error("Erro Fatal:", error);
-                document.querySelector('#clients-table tbody').innerHTML = `<tr><td colspan="10" style="color: var(--primary); text-align: center; padding: 48px;"><strong>ERRO:</strong> Não foi possível conectar ao servidor.</td></tr>`;
-            } finally {
-                document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
-            }
-        }
-
-        // ─── EVENTS ───
-        document.getElementById('btn-export-view').addEventListener('click', gerarOnePageReport);
-        document.getElementById('btn-all-time').addEventListener('click', () => { document.getElementById('date-start').value = ''; document.getElementById('date-end').value = ''; buscarDadosDaApi(); });
-        document.getElementById('btn-update').addEventListener('click', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
-        document.getElementById('client-selector').addEventListener('change', () => { buscarDadosDaApi(document.getElementById('date-start').value, document.getElementById('date-end').value); });
-        document.getElementById('recorrencia-filter').addEventListener('change', () => { aplicarFiltroRecorrencia(); });
-        document.getElementById('pipeline-selector').addEventListener('change', (e) => {
-            const cid = document.getElementById('client-selector').value;
-            const c = cid === "todos" ? dadosGlobais[0] : dadosGlobais.find(c => c.id === parseInt(cid));
-            if (c && c.pipelines) {
-                const p = c.pipelines.find(p => p.id === parseInt(e.target.value));
-                if (p) { renderFunnel(p); atualizarGraficosPorPipeline(p); }
-            }
-        });
-
-        window.onload = async () => {
-            await carregarClientesDropdown();
-            setupTableScroll();
-            buscarDadosDaApi();
-        };
-    </script>
+        window.onload = async () => {
+            await carregarClientesDropdown();
+            setupTableScroll();
+            buscarDadosDaApi();
+        };
+    </script>
 </body>
 </html>
