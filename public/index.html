@@ -135,14 +135,15 @@
         .card:nth-child(4) .value { color: var(--primary); }
         .card .card-sub { margin-top: 10px; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
 
-        /* ─── TABLE WITH PREMIUM SCROLL (100% Original Restoration) ─── */
+        /* ─── TABLE WITH PREMIUM SCROLL (BLINDADA CONTRA ESTICAMENTO) ─── */
         .table-container { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 32px; position: relative; }
         .table-header-bar { padding: 22px 26px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .table-header-bar h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; margin: 0; }
         .table-header-bar .record-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); }
         
-        .table-scroll-area { overflow-x: auto; overflow-y: visible; position: relative; }
-        .table-scroll-area::before, .table-scroll-area::after { content: ''; position: sticky; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 5; display: block; height: 0; }
+        .table-scroll-area { overflow-x: auto; overflow-y: hidden; position: relative; }
+        /* ⚠️ AQUI ESTAVA O BUG: As linhas ::before e ::after foram exterminadas ⚠️ */
+
         .table-scroll-wrapper { position: relative; }
         .table-scroll-wrapper .scroll-fade-left, .table-scroll-wrapper .scroll-fade-right { position: absolute; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 5; transition: opacity 0.3s; }
         .table-scroll-wrapper .scroll-fade-left { left: 0; background: linear-gradient(90deg, var(--card-bg), transparent); opacity: 0; }
@@ -152,22 +153,29 @@
         .scroll-indicator.visible { display: inline-flex; }
         @keyframes fadeInOut { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; display: none; } }
 
-        /* TABELA CORRIGIDA DEFINITIVAMENTE */
-        table { width: 100%; min-width: 1280px; border-collapse: separate; border-spacing: 0; text-indent: initial; }
-        th { padding: 14px 22px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; z-index: 3; }
+        /* TABELA BLINDADA */
+        table { width: 100%; min-width: 1280px; border-collapse: separate; border-spacing: 0; table-layout: fixed; text-indent: initial; }
         
+        /* Forçando a altura das linhas na marreta */
+        tr { height: 60px; max-height: 60px; }
+
+        th { padding: 0 22px; height: 50px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; z-index: 3; vertical-align: middle; }
+        
+        /* Cravando a largura e a sombra da primeira coluna */
         th:first-child, td:first-child { 
-            position: sticky; left: 0; z-index: 4; background: #130303; min-width: 260px; 
+            position: sticky; left: 0; z-index: 4; background: #130303; 
+            width: 260px; min-width: 260px; max-width: 260px;
             box-shadow: 12px 0 15px -10px rgba(0,0,0,0.7); 
         }
         th:first-child { background: #1a0404; z-index: 6; }
         
-        td { padding: 18px 22px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 0 22px; height: 60px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.015); color: var(--text-main); }
         tr:hover td:first-child { background: #1f0505; }
         td strong { color: var(--text-main); font-weight: 600; }
         
+        /* ─── CLASSES DOS BADGES E TEXTOS ─── */
         .admin-count { font-size: 12px; color: var(--text-muted); margin-left: 6px; }
         .finance-text { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 700; font-size: 13px; }
         .cycle-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
