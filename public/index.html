@@ -135,104 +135,66 @@
         .card:nth-child(4) .value { color: var(--primary); }
         .card .card-sub { margin-top: 10px; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
 
-        /* ─── TABLE WITH PREMIUM SCROLL (BLINDAGEM NUCLEAR) ─── */
-        .table-container { 
-            background: var(--card-bg) !important; 
-            border-radius: var(--radius) !important; 
-            border: 1px solid var(--border) !important; 
-            margin-bottom: 32px !important; 
-            position: relative !important; 
-            overflow: hidden !important; 
-        }
-        
+        /* ─── TABLE WITH PREMIUM SCROLL (100% Original Restoration) ─── */
+        .table-container { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 32px; position: relative; }
         .table-header-bar { padding: 22px 26px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .table-header-bar h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; margin: 0; }
         .table-header-bar .record-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); }
         
-        .table-scroll-wrapper { position: relative !important; width: 100% !important; }
+        .table-scroll-area { overflow-x: auto; overflow-y: visible; position: relative; }
+        .table-scroll-area::before, .table-scroll-area::after { content: ''; position: sticky; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 5; display: block; height: 0; }
+        .table-scroll-wrapper { position: relative; }
+        .table-scroll-wrapper .scroll-fade-left, .table-scroll-wrapper .scroll-fade-right { position: absolute; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 5; transition: opacity 0.3s; }
+        .table-scroll-wrapper .scroll-fade-left { left: 0; background: linear-gradient(90deg, var(--card-bg), transparent); opacity: 0; }
+        .table-scroll-wrapper .scroll-fade-right { right: 0; background: linear-gradient(-90deg, var(--card-bg), transparent); opacity: 0; }
         
-        .table-scroll-area { 
-            overflow-x: auto !important; 
-            overflow-y: hidden !important; 
-            width: 100% !important; 
-        }
-
-        /* 1. EXTERMINA QUALQUER CÓDIGO FANTASMA QUE ESTIQUE A TABELA */
-        .table-scroll-area::before, .table-scroll-area::after, td:first-child::after, th:first-child::after { 
-            display: none !important; content: none !important; 
-        }
-
         .scroll-indicator { display: none; align-items: center; justify-content: center; gap: 6px; padding: 6px 14px; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; animation: fadeInOut 3s ease forwards; }
         .scroll-indicator.visible { display: inline-flex; }
         @keyframes fadeInOut { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; display: none; } }
 
-        /* 2. TABELA BLINDADA CONTRA ESMAGAMENTO DE TEXTO */
-        table { 
-            width: 100% !important; 
-            min-width: max-content !important; /* Obriga o navegador a respeitar o tamanho real das palavras */
-            border-collapse: separate !important; 
-            border-spacing: 0 !important; 
-            table-layout: auto !important; 
-        }
-
-        /* 3. MATA O BUG DA ALTURA BIZARRA */
-        tr { 
-            height: 1px !important; /* Força a linha a encolher para o exato tamanho do texto/padding */
-        }
-
-        th, td {
-            padding: 16px 24px !important;
-            white-space: nowrap !important;
-            vertical-align: middle !important;
-        }
-
-        /* CABEÇALHO */
-        th { 
-            background: #1a0404 !important; /* Fundo sólido para evitar sobreposições */
-            color: var(--text-muted) !important; 
-            font-weight: 500 !important; 
-            font-size: 10.5px !important; 
-            text-transform: uppercase !important; 
-            letter-spacing: 1px !important; 
-            border-bottom: 1px solid var(--border) !important; 
-            position: sticky !important; 
-            top: 0 !important; 
-            z-index: 10 !important; 
-        }
-
-        /* CELULAS COMUNS */
-        td { 
-            font-size: 14px !important; 
-            color: var(--text-secondary) !important; 
-            border-bottom: 1px solid var(--border-light) !important; 
-            background: transparent;
-        }
-        tr:last-child td { border-bottom: none !important; }
-
-        /* PRIMEIRA COLUNA: LARGURA CRAVADA NO CONCRETO E SOMBRA */
+        /* TABELA CORRIGIDA DEFINITIVAMENTE */
+        table { width: 100%; min-width: 1280px; border-collapse: separate; border-spacing: 0; text-indent: initial; }
+        th { padding: 14px 22px; text-align: left; background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; z-index: 3; }
+        
         th:first-child, td:first-child { 
-            position: sticky !important; 
-            left: 0 !important; 
-            background: #130303 !important; 
-            width: 260px !important; 
-            min-width: 260px !important; 
-            max-width: 260px !important; 
-            z-index: 20 !important; 
-            border-right: 1px solid rgba(255,255,255,0.05) !important;
-            box-shadow: 6px 0 15px -4px rgba(0,0,0,0.8) !important;
+            position: sticky; left: 0; z-index: 4; background: #130303; min-width: 260px; 
+            box-shadow: 12px 0 15px -10px rgba(0,0,0,0.7); 
         }
+        th:first-child { background: #1a0404; z-index: 6; }
+        
+        td { padding: 18px 22px; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.015); color: var(--text-main); }
+        tr:hover td:first-child { background: #1f0505; }
+        td strong { color: var(--text-main); font-weight: 600; }
+        
+        .admin-count { font-size: 12px; color: var(--text-muted); margin-left: 6px; }
+        .finance-text { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 700; font-size: 13px; }
+        .cycle-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+        .cycle-fast { color: var(--green); }
+        .cycle-medium { color: var(--amber); }
+        .cycle-slow { color: var(--primary); }
 
-        /* CRUZAMENTO DO CABEÇALHO COM A PRIMEIRA COLUNA */
-        th:first-child { 
-            background: #1a0404 !important; 
-            z-index: 30 !important; 
-        }
+        .status-badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; min-width: 96px; justify-content: center; }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .status-good { background: var(--green-soft); color: var(--green); border: 1px solid rgba(52,211,153,0.15); }
+        .status-good::before { background: var(--green); }
+        .status-warning { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(251,191,36,0.15); }
+        .status-warning::before { background: var(--amber); }
+        .status-danger { background: var(--primary-soft); color: var(--primary); border: 1px solid rgba(230,57,70,0.15); }
+        .status-danger::before { background: var(--primary); }
 
-        /* EFEITOS DE HOVER */
-        tr:hover td { background: rgba(255,255,255,0.02) !important; }
-        tr:hover td:first-child { background: #1f0505 !important; }
+        .action-link { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 12px; padding: 5px 14px; border-radius: var(--radius-xs); border: 1px solid rgba(230,57,70,0.2); transition: all 0.2s; background: var(--primary-soft); }
+        .action-link:hover { background: rgba(230,57,70,0.18); border-color: rgba(230,57,70,0.35); }
 
-        td strong { color: var(--text-main) !important; font-weight: 600 !important; }
+        .overdue { color: var(--amber) !important; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .danger-text { color: var(--primary) !important; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .decay-text { color: var(--purple) !important; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .tasks-overdue-text { color: var(--amber) !important; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+        .rec-badge { display: inline-block; font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rec-yes { background: var(--green-soft); color: var(--green); border: 1px solid rgba(52,211,153,0.15); }
+        .rec-no { background: var(--primary-soft); color: var(--primary); border: 1px solid rgba(230,57,70,0.15); }
 
         /* ─── TOOLTIPS ─── */
         .th-tip { position: relative; cursor: help; }
