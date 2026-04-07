@@ -367,7 +367,7 @@
                         const pdfText = await extractTextFromPDF(selectedFile);
                         btnStart.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Enviando para IA...';
                         
-                        const WEBHOOK_URL = 'https://ferrazpiai-n8n-editor.uyk8ty.easypanel.host/webhook-test/6e09b0ba-7a09-4b24-9dd4-177bbd67a3d9';
+                        const WEBHOOK_URL = 'https://ferrazpiai-n8n-editor.uyk8ty.easypanel.host/webhook/6e09b0ba-7a09-4b24-9dd4-177bbd67a3d9';
                         
                         const response = await fetch(WEBHOOK_URL, {
                             method: 'POST',
