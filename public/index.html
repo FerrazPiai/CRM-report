@@ -1020,14 +1020,19 @@
                 return;
             }
 
+            const pipe = getSelectedPipeline(); // PUXA A PIPELINE SELECIONADA (CORREÇÃO DE CONTEXTO)
+            if (!pipe) {
+                alert("Nenhum funil disponível para este cliente.");
+                return;
+            }
+
             const dataInicio = document.getElementById('date-start').value || "Início";
             const dataFim = document.getElementById('date-end').value || "Hoje";
             const periodoStr = dataInicio !== "Início" ? `${dataInicio.split('-').reverse().join('/')} até ${dataFim.split('-').reverse().join('/')}` : "Todo Período";
 
-            // ─── CÁLCULOS BASE ───
-            const leadsTotais = cliente.leadsLast30Days || 0;
-            const vendas = cliente.pipelines?.[0]?.results?.won || 0;
-            const perdas = cliente.pipelines?.[0]?.results?.lost || 0;
+            // ─── CÁLCULOS BASE (AGORA SINCRONIZADOS COM O FUNIL) ───
+            const vendas = pipe.results?.won || 0;
+            const perdas = pipe.results?.lost || 0;
             const receita = cliente.wonRevenue || 0;
             const totalDecididos = vendas + perdas;
             const taxaConversao = totalDecididos > 0 ? (vendas / totalDecididos * 100).toFixed(1) : 0;
@@ -1035,6 +1040,53 @@
             const ciclo = cliente.avgSalesCycle || 0;
             const estagnados = cliente.stagnantLeads || 0;
             const usuariosAtivos = cliente.usersTotal || 0;
+
+            // ─── GRÁFICO MENSAL E LEADS TOTAIS ───
+            let chartHTML = '<p class="text-gray-500 text-sm p-8">Sem dados mensais para exibir o gráfico.</p>';
+            let leadsTotais = 0;
+            
+            if (pipe.monthlyStats && pipe.monthlyStats.length > 0) {
+                const merged = {};
+                pipe.monthlyStats.forEach(m => {
+                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
+                    merged[m.key].leads += m.leads;
+                    merged[m.key].won += m.won;
+                    merged[m.key].lost += m.lost;
+                    leadsTotais += m.leads; // ACUMULA PARA BATER 100% COM O GRÁFICO
+                });
+                
+                const months = Object.keys(merged).sort().slice(-4); 
+                let maxVal = 1;
+                months.forEach(k => { maxVal = Math.max(maxVal, merged[k].leads, merged[k].won, merged[k].lost); });
+                
+                let bars = months.map(k => {
+                    let m = merged[k];
+                    let hL = Math.max(5, (m.leads / maxVal) * 100);
+                    let hW = Math.max(5, (m.won / maxVal) * 100);
+                    let hLo = Math.max(5, (m.lost / maxVal) * 100);
+                    return `
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="flex items-end gap-2 w-full justify-center h-48 border-b border-gray-800 pb-2 relative">
+                            <div class="w-8 bg-blue-500 rounded-t flex flex-col justify-end group relative" style="height: ${hL}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.leads}</span></div>
+                            <div class="w-8 bg-green-500 rounded-t flex flex-col justify-end relative" style="height: ${hW}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.won}</span></div>
+                            <div class="w-8 bg-red-500 rounded-t flex flex-col justify-end relative" style="height: ${hLo}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.lost}</span></div>
+                        </div>
+                        <span class="text-xs text-gray-500 mt-3 font-medium">${m.label || k}</span>
+                    </div>`;
+                }).join('');
+
+                chartHTML = `
+                <div class="flex items-end gap-8 w-full max-w-2xl mx-auto mt-4 px-6">
+                    ${bars}
+                </div>
+                <div class="flex gap-6 mt-8 border-t border-gray-800 pt-4">
+                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-blue-500 rounded-sm"></span> Leads Gerados</div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-green-500 rounded-sm"></span> Vendas</div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-red-500 rounded-sm"></span> Perdas</div>
+                </div>`;
+            } else {
+                leadsTotais = cliente.leadsLast30Days || 0; // Fallback se não houver stats detalhados
+            }
 
             // ─── INTELIGÊNCIA DA NOTA E STATUS ───
             let nota = 5;
@@ -1063,51 +1115,9 @@
                 statusDot = 'bg-yellow-500';
             }
 
-            // ─── GRÁFICO MENSAL (LEADS & VENDAS) MOCK CSS ───
-            let chartHTML = '<p class="text-gray-500 text-sm p-8">Sem dados mensais para exibir o gráfico.</p>';
-            if (cliente.monthlyStats && cliente.monthlyStats.length > 0) {
-                const merged = {};
-                cliente.monthlyStats.forEach(m => {
-                    if (!merged[m.key]) merged[m.key] = { ...m, leads: 0, won: 0, lost: 0 };
-                    merged[m.key].leads += m.leads;
-                    merged[m.key].won += m.won;
-                    merged[m.key].lost += m.lost;
-                });
-                const months = Object.keys(merged).sort().slice(-4); 
-                let maxVal = 1;
-                months.forEach(k => { maxVal = Math.max(maxVal, merged[k].leads, merged[k].won, merged[k].lost); });
-                
-                let bars = months.map(k => {
-                    let m = merged[k];
-                    let hL = Math.max(5, (m.leads / maxVal) * 100);
-                    let hW = Math.max(5, (m.won / maxVal) * 100);
-                    let hLo = Math.max(5, (m.lost / maxVal) * 100);
-                    return `
-                    <div class="flex flex-col items-center flex-1">
-                        <div class="flex items-end gap-2 w-full justify-center h-48 border-b border-gray-800 pb-2 relative">
-                            <div class="w-8 bg-blue-500 rounded-t flex flex-col justify-end group relative" style="height: ${hL}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.leads}</span></div>
-                            <div class="w-8 bg-green-500 rounded-t flex flex-col justify-end relative" style="height: ${hW}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.won}</span></div>
-                            <div class="w-8 bg-red-500 rounded-t flex flex-col justify-end relative" style="height: ${hLo}%"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-mono font-bold text-gray-300">${m.lost}</span></div>
-                        </div>
-                        <span class="text-xs text-gray-500 mt-3 font-medium">${m.label}</span>
-                    </div>`;
-                }).join('');
-
-                chartHTML = `
-                <div class="flex items-end gap-8 w-full max-w-2xl mx-auto mt-4 px-6">
-                    ${bars}
-                </div>
-                <div class="flex gap-6 mt-8 border-t border-gray-800 pt-4">
-                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-blue-500 rounded-sm"></span> Leads Gerados</div>
-                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-green-500 rounded-sm"></span> Vendas</div>
-                    <div class="flex items-center gap-2 text-xs text-gray-400"><span class="w-3 h-3 bg-red-500 rounded-sm"></span> Perdas</div>
-                </div>`;
-            }
-
             // ─── FUNIL HORIZONTAL ───
             let funnelHTML = '<p class="text-gray-500 text-sm">Dados de funil indisponíveis.</p>';
-            if (cliente.pipelines && cliente.pipelines[0]) {
-                const pipe = cliente.pipelines[0];
+            if (pipe.stages && pipe.stages.length > 0) {
                 let maxFunnelVal = Math.max(pipe.results.won, pipe.results.lost);
                 pipe.stages.forEach(s => maxFunnelVal = Math.max(maxFunnelVal, s.count));
                 if(maxFunnelVal === 0) maxFunnelVal = 1;
@@ -1152,8 +1162,8 @@
             let inatividadeCount = 0;
             let inatividadePct = 0;
 
-            if (cliente.pipelines?.[0]?.lossReasons && cliente.pipelines[0].lossReasons.length > 0) {
-                const lossData = [...cliente.pipelines[0].lossReasons].sort((a,b) => b.count - a.count);
+            if (pipe.lossReasons && pipe.lossReasons.length > 0) {
+                const lossData = [...pipe.lossReasons].sort((a,b) => b.count - a.count);
                 const totalPerdasVal = lossData.reduce((acc, curr) => acc + curr.count, 0);
                 
                 motivosPerdaHTML = lossData.map((motivo, index) => {
