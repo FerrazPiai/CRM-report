@@ -106,7 +106,7 @@
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
         .date-separator { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
 
-        .btn { padding: 10px 22px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; transition: all 0.25s; letter-spacing: 0.3px; position: relative; overflow: hidden; }
+        .btn { padding: 10px 22px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; transition: all 0.25s; letter-spacing: 0.3px; position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: linear-gradient(135deg, var(--primary), #991b1b); color: white; box-shadow: 0 2px 16px var(--primary-glow); }
         .btn-primary:hover { box-shadow: 0 4px 24px var(--primary-glow); transform: translateY(-1px); }
@@ -229,7 +229,7 @@
         .status-danger { background: var(--primary-soft); color: var(--primary); border: 1px solid rgba(230,57,70,0.15); }
         .status-danger::before { background: var(--primary); }
 
-        .action-link { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 12px; padding: 5px 14px; border-radius: var(--radius-xs); border: 1px solid rgba(230,57,70,0.2); transition: all 0.2s; background: var(--primary-soft); }
+        .action-link { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 12px; padding: 5px 14px; border-radius: var(--radius-xs); border: 1px solid rgba(230,57,70,0.2); transition: all 0.2s; background: var(--primary-soft); display: inline-block; }
         .action-link:hover { background: rgba(230,57,70,0.18); border-color: rgba(230,57,70,0.35); }
 
         .overdue { color: var(--amber) !important; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
@@ -347,26 +347,56 @@
         .analytics-row-full { animation-delay: 0.32s; }
         .billing-section { animation-delay: 0.36s; }
 
-        /* ─── RESPONSIVE ─── */
+        /* ─── RESPONSIVE RULES ─── */
         @media (max-width: 1100px) {
             .summary-cards { grid-template-columns: repeat(2, 1fr); }
             .analytics-row { grid-template-columns: 1fr; }
         }
         @media (max-width: 900px) {
-            .app-wrapper { padding: 20px 16px 40px; }
-            .summary-cards { grid-template-columns: 1fr; }
-            header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-            .toolbar-filters { flex-direction: column; }
+            .app-wrapper { padding: 24px 20px 48px; }
+            header { flex-direction: column; align-items: flex-start; gap: 16px; padding-bottom: 20px; }
+            .toolbar { flex-direction: column; align-items: stretch; padding: 16px; }
+            .toolbar-filters { flex-direction: column; align-items: stretch; width: 100%; }
+            .form-control, select.form-control { width: 100%; min-width: 100%; }
+            .date-separator { display: none; }
+            .toolbar .flex { flex-direction: column; width: 100%; }
+            .toolbar .btn { width: 100%; display: flex; justify-content: center; }
             .funnel-outcomes { grid-template-columns: 1fr; }
-            .funnel-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .funnel-header { flex-direction: column; gap: 16px; align-items: flex-start; }
             .billing-grid { grid-template-columns: 1fr; }
+            .funnel-section { padding: 20px 16px; }
+            .analytics-panel { padding: 20px 16px; }
+        }
+        @media (max-width: 600px) {
+            .summary-cards { grid-template-columns: 1fr; gap: 12px; }
+            header h1 { font-size: 20px; }
+            .app-wrapper { padding: 16px 12px 40px; }
+            .billing-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .billing-status { align-self: flex-start; }
+            .table-header-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
         }
     </style>
 </head>
-<body class="flex h-screen w-full overflow-hidden bg-mainbg font-sans">
+<body class="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-mainbg font-sans">
 
-    <aside class="w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-20 shadow-2xl border-r border-white/5 relative">
+    <!-- Mobile Header -->
+    <div class="lg:hidden w-full bg-sidebar border-b border-white/5 px-6 py-4 flex justify-between items-center z-40 relative flex-shrink-0 shadow-lg">
+        <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="h-6 sm:h-8 object-contain drop-shadow-md" />
+        <button id="mobile-menu-btn" class="text-gray-300 hover:text-white text-2xl focus:outline-none transition-colors">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Overlay da Sidebar Mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/70 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Sidebar Lateral -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-50 shadow-2xl border-r border-white/5 transition-transform duration-300 ease-in-out">
+        
+        <button id="close-sidebar-btn" class="lg:hidden absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors focus:outline-none">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
         <div class="w-full flex flex-col">
             <div class="w-full flex justify-center px-8 mb-12 mt-2">
                 <div class="w-full flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer">
@@ -549,7 +579,42 @@
     </main>
 
     <script>
-        // Lógica visual simples para os menus laterais novos
+        // ==========================================
+        // Lógica do Menu Mobile (Hamburger)
+        // ==========================================
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+        function toggleSidebar() {
+            if(!sidebar) return;
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                setTimeout(() => sidebarOverlay.classList.add('opacity-100'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('opacity-100');
+                setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        mobileMenuBtn?.addEventListener('click', toggleSidebar);
+        closeSidebarBtn?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', toggleSidebar);
+
+        const sidebarLinks = sidebar.querySelectorAll('nav a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) toggleSidebar();
+            });
+        });
+
+        // ==========================================
+        // Lógica Original do Sistema - PRESERVADA
+        // ==========================================
         function handleMenuClick(menuName) {
             console.log(`Menu [${menuName}] clicado!`);
         }
@@ -1008,7 +1073,7 @@
                     merged[m.key].won += m.won;
                     merged[m.key].lost += m.lost;
                 });
-                const months = Object.keys(merged).sort().slice(-4); // Pega os ultimos 4 meses max
+                const months = Object.keys(merged).sort().slice(-4); 
                 let maxVal = 1;
                 months.forEach(k => { maxVal = Math.max(maxVal, merged[k].leads, merged[k].won, merged[k].lost); });
                 
@@ -1357,7 +1422,7 @@
                 // Interrompe o fetch se estiver no preview para evitar o crash de URL
                 if (isPreviewEnv) {
                     tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-main); text-align: center; padding: 48px; background: rgba(255,255,255,0.02); border-radius: 8px;"><strong>⚠️ Ambiente de Visualização:</strong> O design está pronto! Rode este HTML junto com o seu arquivo <code>server.js</code> (localhost) para visualizar os dados reais da API.</td></tr>`;
-                    document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
+                    document.getElementById('btn-update').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Atualizar Dados';
                     return;
                 }
 
@@ -1378,7 +1443,7 @@
                 console.error("Erro Fatal:", error);
                 document.querySelector('#clients-table tbody').innerHTML = `<tr><td colspan="10" style="color: var(--primary); text-align: center; padding: 48px;"><strong>ERRO:</strong> Não foi possível conectar ao servidor.</td></tr>`;
             } finally {
-                document.getElementById('btn-update').innerHTML = '⟳ &nbsp;Atualizar Dados';
+                document.getElementById('btn-update').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Atualizar Dados';
             }
         }
 
