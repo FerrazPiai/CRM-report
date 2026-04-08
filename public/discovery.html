@@ -69,9 +69,27 @@
         .modal-overlay.show .modal-content { transform: scale(1); }
     </style>
 </head>
-<body class="flex h-screen w-full overflow-hidden bg-mainbg font-sans text-gray-200">
+<body class="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-mainbg font-sans text-gray-200 relative">
 
-    <aside class="w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-20 shadow-2xl border-r border-white/5 relative">
+    <!-- Mobile Header (Visível apenas em telas menores) -->
+    <div class="lg:hidden w-full bg-sidebar border-b border-white/5 px-6 py-4 flex justify-between items-center z-40 relative flex-shrink-0 shadow-lg">
+        <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="h-6 sm:h-8 object-contain drop-shadow-md" />
+        <button id="mobile-menu-btn" class="text-gray-300 hover:text-white text-2xl focus:outline-none transition-colors">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Overlay da Sidebar Mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/70 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Sidebar Lateral -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-50 shadow-2xl border-r border-white/5 transition-transform duration-300 ease-in-out">
+        
+        <!-- Botão fechar na Sidebar (Apenas Mobile) -->
+        <button id="close-sidebar-btn" class="lg:hidden absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors focus:outline-none">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
         <div class="w-full flex flex-col">
             <div class="w-full flex justify-center px-8 mb-12 mt-2">
                 <div class="w-full flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer">
@@ -122,51 +140,51 @@
         <div class="glow-effect glow-left"></div>
         <div class="glow-effect glow-right"></div>
 
-        <div class="max-w-[1200px] mx-auto relative z-10 px-8 pb-20">
+        <div class="max-w-[1200px] mx-auto relative z-10 px-4 sm:px-8 pb-20">
             
-            <header class="flex flex-col md:flex-row justify-between items-center py-8 mb-8 border-b border-white/5">
-                <div class="flex gap-8 mb-4 md:mb-0">
-                    <h2 class="text-white text-lg font-sans font-bold tracking-wide flex items-center gap-2">
+            <header class="flex flex-col md:flex-row justify-between items-center py-6 sm:py-8 mb-8 border-b border-white/5 gap-6 md:gap-0">
+                <div class="flex gap-4 sm:gap-8 flex-wrap justify-center md:justify-start w-full md:w-auto">
+                    <h2 class="text-white text-lg sm:text-xl font-sans font-bold tracking-wide flex items-center gap-2">
                         <i class="fa-solid fa-microphone-lines text-v4red"></i> Roteiros de Discovery
                     </h2>
                 </div>
                 
-                <a href="https://wa.me/5512992140358" target="_blank" class="bg-white/5 border border-white/10 hover:border-v4red hover:bg-v4red/10 text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300">
+                <a href="https://wa.me/5512992140358" target="_blank" class="w-full md:w-auto justify-center bg-white/5 border border-white/10 hover:border-v4red hover:bg-v4red/10 text-white px-5 py-3 md:py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300">
                     <i class="fa-solid fa-headset text-v4red"></i> Contatar Suporte
                 </a>
             </header>
 
-            <section class="fade-in-up mb-20">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-cardbg border border-white/5 p-10 md:p-14 rounded-[40px] shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-v4red/10 rounded-full filter blur-[80px] pointer-events-none"></div>
+            <section class="fade-in-up mb-16 sm:mb-20">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center bg-cardbg border border-white/5 p-6 sm:p-10 md:p-14 rounded-[30px] sm:rounded-[40px] shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-v4red/10 rounded-full filter blur-[80px] pointer-events-none"></div>
 
-                    <div class="relative z-10">
+                    <div class="relative z-10 text-center lg:text-left">
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-v4red/10 border border-v4red/20 text-v4red text-xs font-bold uppercase tracking-wider mb-6">
                             <i class="fa-solid fa-brain"></i> IA de Vendas
                         </div>
-                        <h1 class="font-sans text-4xl lg:text-5xl font-bold mb-6 text-white leading-tight">
-                            Gere Roteiros de <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-v4red">Call Imbatíveis</span>
+                        <h1 class="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-white leading-tight">
+                            Gere Roteiros de <br class="hidden sm:block"> <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-v4red">Call Imbatíveis</span>
                         </h1>
-                        <p class="text-gray-400 text-lg mb-8 leading-relaxed">
+                        <p class="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed">
                             Anexe o formulário de qualificação, briefing ou anotações prévias do lead (em <strong class="text-white font-medium">PDF</strong>). Nossa automação analisará a empresa e montará o roteiro de perguntas perfeito para sua call de Discovery.
                         </p>
                         
-                        <button id="btn-start" class="w-full sm:w-auto bg-gradient-to-r from-v4red to-red-800 hover:from-v4redhover hover:to-v4red text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg shadow-red-900/30 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <button id="btn-start" class="w-full sm:w-auto bg-gradient-to-r from-v4red to-red-800 hover:from-v4redhover hover:to-v4red text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg shadow-red-900/30 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 mx-auto lg:mx-0">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Roteiro
                         </button>
                     </div>
 
                     <div class="upload-area w-full relative z-10">
                         <input type="file" id="file-upload" accept="application/pdf" class="hidden">
-                        <label for="file-upload" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-[350px] border-2 border-dashed border-white/20 rounded-3xl bg-black/40 hover:bg-v4red/5 hover:border-v4red/50 cursor-pointer transition-all duration-300 group overflow-hidden">
+                        <label for="file-upload" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-[300px] sm:h-[350px] border-2 border-dashed border-white/20 rounded-3xl bg-black/40 hover:bg-v4red/5 hover:border-v4red/50 cursor-pointer transition-all duration-300 group overflow-hidden">
                             <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 z-0 pointer-events-none"></div>
                             
                             <div class="relative z-10 flex flex-col items-center p-6 text-center">
-                                <div class="w-20 h-20 mb-5 rounded-full bg-white/5 border border-white/10 group-hover:border-v4red/30 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(220,38,38,0.2)]">
-                                    <i class="fa-regular fa-file-pdf text-4xl text-gray-500 group-hover:text-v4red transition-colors" id="upload-icon"></i>
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 mb-5 rounded-full bg-white/5 border border-white/10 group-hover:border-v4red/30 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+                                    <i class="fa-regular fa-file-pdf text-3xl sm:text-4xl text-gray-500 group-hover:text-v4red transition-colors" id="upload-icon"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-white mb-2" id="file-name">Briefing do Lead</h3>
-                                <p class="text-sm text-gray-500 max-w-[250px]">Arraste o PDF com os dados do cliente para cá.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2" id="file-name">Briefing do Lead</h3>
+                                <p class="text-xs sm:text-sm text-gray-500 max-w-[200px] sm:max-w-[250px]">Arraste o PDF com os dados do cliente para cá.</p>
                             </div>
                         </label>
                     </div>
@@ -174,35 +192,37 @@
             </section>
 
             <section class="fade-in-up delay-100">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
                     <div>
-                        <h2 class="font-sans text-2xl font-bold text-white">Últimos Roteiros</h2>
-                        <p class="text-sm text-gray-500 mt-1">Acesse os roteiros de discovery gerados recentemente pela IA.</p>
+                        <h2 class="font-sans text-xl sm:text-2xl font-bold text-white">Últimos Roteiros</h2>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Acesse os roteiros de discovery gerados recentemente pela IA.</p>
                     </div>
-                    <button class="text-v4red text-sm font-semibold hover:text-white transition-colors">
+                    <button class="text-v4red text-xs sm:text-sm font-semibold hover:text-white transition-colors w-full sm:w-auto text-left sm:text-right">
                         Ver todos <i class="fa-solid fa-arrow-right ml-1"></i>
                     </button>
                 </div>
 
                 <div id="roteiros-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4 text-v4red"></i>
-        <p>Buscando roteiros reais no repositório...</p>
-    </div>
-</div>
+                    <div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-500 text-sm sm:text-base">
+                        <i class="fa-solid fa-circle-notch fa-spin text-2xl sm:text-3xl mb-4 text-v4red"></i>
+                        <p>Buscando roteiros reais no repositório...</p>
+                    </div>
+                </div>
             </section>
 
-        </div> <div id="custom-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
-            <div class="modal-content bg-cardbg border border-white/10 rounded-3xl p-8 max-w-sm w-full mx-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center relative overflow-hidden">
+        </div> 
+        
+        <div id="custom-modal" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/80 px-4">
+            <div class="modal-content bg-cardbg border border-white/10 rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-v4red to-red-900"></div>
                 
-                <div class="modal-icon w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">
-                    </div>
+                <div class="modal-icon w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-inner">
+                </div>
                 
-                <h2 id="modal-title" class="font-sans text-2xl font-bold text-white mb-2">Sucesso!</h2>
-                <p id="modal-message" class="text-gray-400 text-sm mb-8">O documento foi enviado para a IA.</p>
+                <h2 id="modal-title" class="font-sans text-xl sm:text-2xl font-bold text-white mb-2">Sucesso!</h2>
+                <p id="modal-message" class="text-gray-400 text-xs sm:text-sm mb-6 sm:mb-8">O documento foi enviado para a IA.</p>
                 
-                <button id="btn-close-modal" class="w-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-semibold py-3.5 rounded-xl transition-all duration-300">
+                <button id="btn-close-modal" class="w-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-semibold py-3 sm:py-3.5 rounded-xl transition-all duration-300 text-sm sm:text-base">
                     Entendido
                 </button>
             </div>
@@ -212,6 +232,42 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+        // ==========================================
+        // Lógica do Menu Mobile (Hamburger)
+        // ==========================================
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                setTimeout(() => sidebarOverlay.classList.add('opacity-100'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('opacity-100');
+                setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        mobileMenuBtn?.addEventListener('click', toggleSidebar);
+        closeSidebarBtn?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', toggleSidebar);
+
+        // Fechar sidebar ao clicar nos links (em mobile)
+        const sidebarLinks = sidebar.querySelectorAll('nav a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleSidebar();
+                }
+            });
+        });
+
         
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-upload');
@@ -237,13 +293,13 @@
 
             if (type === 'success') {
                 modalIconContainer.innerHTML = '<i class="fa-solid fa-check"></i>';
-                modalIconContainer.className = 'modal-icon w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl mb-6 bg-green-500/10 text-green-500 border border-green-500/20';
+                modalIconContainer.className = 'modal-icon w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-6 bg-green-500/10 text-green-500 border border-green-500/20';
             } else if (type === 'error') {
                 modalIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-                modalIconContainer.className = 'modal-icon w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl mb-6 bg-red-500/10 text-red-500 border border-red-500/20';
+                modalIconContainer.className = 'modal-icon w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-6 bg-red-500/10 text-red-500 border border-red-500/20';
             } else {
                 modalIconContainer.innerHTML = '<i class="fa-solid fa-info"></i>';
-                modalIconContainer.className = 'modal-icon w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl mb-6 bg-blue-500/10 text-blue-500 border border-blue-500/20';
+                modalIconContainer.className = 'modal-icon w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-6 bg-blue-500/10 text-blue-500 border border-blue-500/20';
             }
             
             modal.classList.remove('hidden'); 
@@ -266,9 +322,9 @@
             if (file && file.type === 'application/pdf') {
                 selectedFile = file;
                 fileNameDisplay.textContent = file.name;
-                fileNameDisplay.className = "text-lg font-bold text-green-400 mb-2 truncate max-w-[250px] px-2";
+                fileNameDisplay.className = "text-base sm:text-lg font-bold text-green-400 mb-2 truncate max-w-[200px] sm:max-w-[250px] px-2";
                 
-                uploadIcon.className = "fa-solid fa-file-circle-check text-4xl text-green-400 transition-colors";
+                uploadIcon.className = "fa-solid fa-file-circle-check text-3xl sm:text-4xl text-green-400 transition-colors";
                 dropZone.classList.add('border-green-500/50', 'bg-green-500/5');
                 dropZone.classList.remove('border-white/20', 'bg-black/40');
             } else {
@@ -333,22 +389,22 @@
                 htmlFiles.reverse().forEach(file => {
                     const nomeFormatado = file.name.replace('.html', '').replace(/[-_]/g, ' ');
                     // Monta a URL pública do GitHub Pages para renderizar o HTML
-const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folderPath}/${file.name}`;
+                    const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folderPath}/${file.name}`;
 
                     const card = `
-                        <div class="fade-in-up bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-6 transition-all duration-300 group flex flex-col cursor-pointer">
+                        <div class="fade-in-up bg-cardbg hover:bg-cardhover border border-white/5 hover:border-v4red/30 rounded-2xl p-5 sm:p-6 transition-all duration-300 group flex flex-col cursor-pointer">
                             <div class="flex justify-between items-start mb-4">
-                                <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Salvo no GitHub</span>
-                                <i class="fa-brands fa-github text-gray-600 group-hover:text-v4red transition-colors text-xl"></i>
+                                <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide">Salvo no GitHub</span>
+                                <i class="fa-brands fa-github text-gray-600 group-hover:text-v4red transition-colors text-lg sm:text-xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold text-white mb-1 capitalize">${nomeFormatado}</h3>
-                            <p class="text-sm text-gray-400 mb-6 line-clamp-2">Roteiro sincronizado diretamente da base de dados do repositório.</p>
+                            <h3 class="text-lg sm:text-xl font-bold text-white mb-1 capitalize">${nomeFormatado}</h3>
+                            <p class="text-xs sm:text-sm text-gray-400 mb-6 line-clamp-2">Roteiro sincronizado diretamente da base de dados do repositório.</p>
                             
                             <div class="mt-auto border-t border-white/5 pt-4 flex justify-between items-center">
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                <div class="text-[10px] sm:text-xs text-gray-500 flex items-center gap-1">
                                     <i class="fa-solid fa-cloud-arrow-down"></i> Nuvem
                                 </div>
-                                <a href="${urlVisualizacao}" target="_blank" class="text-white bg-white/5 hover:bg-v4red px-4 py-2 rounded-lg text-xs font-semibold transition-colors">
+                                <a href="${urlVisualizacao}" target="_blank" class="text-white bg-white/5 hover:bg-v4red px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-colors">
                                     Abrir Roteiro
                                 </a>
                             </div>
@@ -360,8 +416,8 @@ const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folder
             } catch (error) {
                 console.error("Erro ao buscar arquivos:", error);
                 grid.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-8 text-red-500/80 border border-red-500/20 rounded-2xl bg-red-500/5">
-                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
+                    <div class="col-span-full flex flex-col items-center justify-center py-8 text-red-500/80 border border-red-500/20 rounded-2xl bg-red-500/5 text-sm sm:text-base text-center px-4">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl sm:text-3xl mb-2"></i>
                         <p>Erro ao sincronizar com o GitHub. Verifique as configurações.</p>
                     </div>`;
             }
@@ -419,8 +475,8 @@ const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folder
                         fileInput.value = '';
                         selectedFile = null;
                         fileNameDisplay.textContent = "Briefing do Lead";
-                        fileNameDisplay.className = "text-xl font-bold text-white mb-2";
-                        uploadIcon.className = "fa-regular fa-file-pdf text-4xl text-gray-500 group-hover:text-v4red transition-colors";
+                        fileNameDisplay.className = "text-lg sm:text-xl font-bold text-white mb-2";
+                        uploadIcon.className = "fa-regular fa-file-pdf text-3xl sm:text-4xl text-gray-500 group-hover:text-v4red transition-colors";
                         dropZone.classList.remove('border-green-500/50', 'bg-green-500/5');
                         dropZone.classList.add('border-white/20', 'bg-black/40');
                     }, 3000);
@@ -435,6 +491,6 @@ const urlVisualizacao = `https://${githubOwner}.github.io/${githubRepo}/${folder
             });
         }
     });
-</script>
+    </script>
 </body>
 </html>
