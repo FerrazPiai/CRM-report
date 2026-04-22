@@ -138,15 +138,11 @@
 
         <div class="flex-1 overflow-y-auto px-4 sm:px-8 pb-10 flex flex-col">
             
-            <header class="flex flex-col md:flex-row justify-between items-center py-6 sm:py-8 mb-4 border-b border-white/5 gap-6 md:gap-0 relative z-20">
+            <header class="flex flex-col md:flex-row justify-between items-center py-6 sm:py-8 mb-2 border-b border-white/5 gap-6 md:gap-0 relative z-20">
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-2 w-full md:w-auto text-center md:text-left">
                     <h2 class="text-white text-xl sm:text-2xl font-sans font-bold tracking-wide flex items-center gap-3">
-                        <i class="fa-solid fa-rocket text-v4red"></i> POP | Implementação de CRM
+                        <i class="fa-solid fa-book-open text-v4red"></i> Hub de Conhecimento V4
                     </h2>
-                    <div class="hidden md:flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 md:ml-4 mt-1">
-                        <div class="w-2 h-2 bg-v4red rounded-full animate-pulse"></div>
-                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Processo v2.0</span>
-                    </div>
                 </div>
                 
                 <a href="https://wa.me/5512992140358" target="_blank" class="w-full md:w-auto justify-center bg-white/5 border border-white/10 hover:border-v4red hover:bg-v4red/10 text-white px-5 py-3 md:py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300">
@@ -154,13 +150,23 @@
                 </a>
             </header>
 
-            <!-- Container Principal do POP -->
-            <section class="fade-in-up flex-1 flex flex-col md:flex-row gap-6 relative z-20 h-full max-h-[85vh]">
+            <!-- Toggle de Seções (Abas) -->
+            <div class="flex bg-black/40 p-1.5 rounded-xl border border-white/10 w-full sm:w-fit mb-6 mx-auto md:mx-0 z-20 relative">
+                <button id="btn-mode-pop" class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 bg-v4red text-white shadow-lg shadow-red-900/40">
+                    <i class="fa-solid fa-rocket mr-2"></i> POP Implementação
+                </button>
+                <button id="btn-mode-manual" class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5">
+                    <i class="fa-solid fa-chart-line mr-2"></i> Manual do Dashboard
+                </button>
+            </div>
+
+            <!-- Container Principal -->
+            <section class="fade-in-up flex-1 flex flex-col md:flex-row gap-6 relative z-20 h-full max-h-[75vh]">
                 
-                <!-- Coluna Esquerda: Timeline -->
+                <!-- Coluna Esquerda: Timeline / Menu de Navegação -->
                 <div class="w-full md:w-1/3 lg:w-1/4 bg-cardbg border border-white/5 rounded-3xl backdrop-blur-md flex flex-col overflow-hidden shadow-2xl">
                     <div class="p-6 pb-4 border-b border-white/5 bg-black/20 flex justify-between items-center">
-                        <h3 class="text-white font-sans font-bold text-lg">Fases do Projeto</h3>
+                        <h3 id="sidebar-title" class="text-white font-sans font-bold text-lg">Fases do Projeto</h3>
                         <span id="total-steps-badge" class="bg-v4red/20 text-v4red border border-v4red/30 px-2.5 py-1 rounded-full text-xs font-bold"></span>
                     </div>
                     
@@ -175,11 +181,11 @@
                     <!-- Estado Inicial (Welcome) -->
                     <div id="welcome-view" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-500 z-10">
                         <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
-                            <i class="fa-solid fa-route text-4xl text-v4red opacity-80 animate-bounce"></i>
+                            <i id="welcome-icon" class="fa-solid fa-route text-4xl text-v4red opacity-80 animate-bounce"></i>
                         </div>
-                        <h2 class="text-2xl sm:text-3xl font-sans font-bold mb-4 text-white">Bem-vindo ao Novo Fluxo</h2>
-                        <p class="text-gray-400 text-sm sm:text-base max-w-lg leading-relaxed">
-                            Simplificamos as tarefas para o executor. Selecione uma etapa no menu à esquerda para visualizar os detalhes, bloqueios e requisitos de cada fase da implementação do CRM.
+                        <h2 id="welcome-title" class="text-2xl sm:text-3xl font-sans font-bold mb-4 text-white">Bem-vindo ao Novo Fluxo</h2>
+                        <p id="welcome-desc" class="text-gray-400 text-sm sm:text-base max-w-lg leading-relaxed">
+                            Selecione uma etapa no menu à esquerda para visualizar os detalhes, instruções e requisitos do procedimento padrão.
                         </p>
                     </div>
 
@@ -187,13 +193,13 @@
                     <div id="detail-card" class="absolute inset-0 flex flex-col overflow-y-auto opacity-0 pointer-events-none transform scale-95 transition-all duration-500 z-20 bg-black/20">
                         
                         <!-- Cabeçalho do Card -->
-                        <div class="p-8 pb-6 border-b border-white/5 relative bg-gradient-to-b from-black/40 to-transparent">
+                        <div class="p-8 pb-6 border-b border-white/5 relative bg-gradient-to-b from-black/40 to-transparent flex-shrink-0">
                             <div class="absolute top-0 right-0 bg-v4red text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider shadow-lg shadow-red-900/50">
                                 Passo <span id="card-step-number"></span> de <span id="total-steps-count"></span>
                             </div>
                             
                             <div class="flex items-center gap-5 mt-2">
-                                <div id="card-icon-container" class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-v4red text-2xl shadow-inner">
+                                <div id="card-icon-container" class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-v4red text-2xl shadow-inner flex-shrink-0">
                                     <!-- Icon -->
                                 </div>
                                 <h2 id="card-title" class="text-2xl sm:text-3xl font-sans font-bold text-white">Título</h2>
@@ -201,27 +207,27 @@
                         </div>
 
                         <!-- Corpo do Card -->
-                        <div class="p-8 flex-1">
+                        <div class="p-8 flex-1 flex flex-col">
                             
                             <!-- Box de Alerta (Blocagem) -->
-                            <div id="card-alert" class="hidden mb-8 bg-v4red/10 border-l-4 border-v4red p-5 rounded-r-xl shadow-md">
+                            <div id="card-alert" class="hidden mb-8 bg-v4red/10 border-l-4 border-v4red p-5 rounded-r-xl shadow-md flex-shrink-0">
                                 <div class="flex items-start gap-4">
-                                    <i class="fa-solid fa-circle-exclamation text-v4red text-2xl mt-0.5"></i>
+                                    <i class="fa-solid fa-circle-exclamation text-v4red text-2xl mt-0.5 flex-shrink-0"></i>
                                     <div>
-                                        <h4 class="text-v4red font-bold text-sm uppercase mb-1 tracking-wide">Atenção Crítica (Blocker)</h4>
+                                        <h4 id="card-alert-title" class="text-v4red font-bold text-sm uppercase mb-1 tracking-wide">Atenção Crítica (Blocker)</h4>
                                         <p id="card-alert-text" class="text-gray-300 text-sm leading-relaxed"></p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Descrição -->
-                            <div class="mb-8">
-                                <h3 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-4 border-b border-white/10 pb-2">Instruções e Documentação da Tarefa</h3>
+                            <div class="mb-8 flex-1">
+                                <h3 id="card-desc-title" class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-4 border-b border-white/10 pb-2">Instruções e Documentação</h3>
                                 <div id="card-desc" class="text-base text-gray-300 leading-relaxed font-light"></div>
                             </div>
 
                             <!-- Rodapé do Card (Infos Adicionais) -->
-                            <div class="bg-black/40 rounded-xl p-5 border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
+                            <div id="card-footer" class="bg-black/40 rounded-xl p-5 border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto flex-shrink-0">
                                 <div class="flex items-center gap-4">
                                     <div class="bg-white/5 text-gray-400 p-3 rounded-full border border-white/5">
                                         <i class="fa-regular fa-calendar-check text-xl"></i>
@@ -273,9 +279,9 @@
             sidebarOverlay?.addEventListener('click', toggleSidebar);
 
             // ==========================================
-            // DADOS DO POP (Mapeados para Dark Mode e FontAwesome)
+            // BASE DE DADOS 1: POP DE IMPLEMENTAÇÃO
             // ==========================================
-            const processSteps = [
+            const popSteps = [
                 {
                     id: 1,
                     title: "Growth Class (Kick-off)",
@@ -304,6 +310,7 @@
                     `,
                     icon: "fa-solid fa-person-chalkboard",
                     isBlocker: true,
+                    alertTitle: "Atenção Crítica (Blocker)",
                     alertText: "NÃO AVANÇAR SEM ESSA CALL. Apenas prossiga após o cliente assinar ou dar o 'de acordo' nas premissas alinhadas nesta etapa."
                 },
                 {
@@ -312,8 +319,7 @@
                     shortDesc: "Imersão no negócio do cliente.",
                     fullDesc: "Realizar a <strong class='text-white'>Call de Discovery</strong> e aplicar formulários. O objetivo principal desta tarefa é coletar, ouvir e confirmar todas as informações estratégicas sobre o segmento, modelo de negócios, jornada atual do lead e requisitos técnicos do cliente.",
                     icon: "fa-solid fa-phone-volume",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 },
                 {
                     id: 3,
@@ -322,6 +328,7 @@
                     fullDesc: "Montar um documento de planejamento (Blueprint) de CRM detalhado. Este documento deve obrigatoriamente conter:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Mapeamento das Etapas de Funil.</li><li>Definição e número de usuários que acessarão a plataforma.</li><li>Desenho de todas as automações necessárias.</li><li>Textos e Modelos de Mensagens Padrões.</li></ul>",
                     icon: "fa-solid fa-pen-ruler",
                     isBlocker: true,
+                    alertTitle: "Atenção Crítica (Blocker)",
                     alertText: "ESSA TAREFA SÓ DEVERÁ SER CONCLUÍDA APÓS O CLIENTE APROVAR. Para dar início às próximas tarefas, precisamos deste documento aprovado e validado formalmente pelo cliente."
                 },
                 {
@@ -330,8 +337,7 @@
                     shortDesc: "Criar contas e assinar plano.",
                     fullDesc: "Após o planejamento de CRM ser aprovado, realizar a criação da conta e a contratação da plataforma de CRM escolhida. Iniciar pelo menos no plano grátis de testes ou período de trial, garantindo acesso completo à equipe executora.",
                     icon: "fa-solid fa-credit-card",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 },
                 {
                     id: 5,
@@ -339,8 +345,7 @@
                     shortDesc: "Implementar fluxos e automações.",
                     fullDesc: "<strong class='text-white'>Tarefa Unificada:</strong> Aqui centralizamos a execução do que foi aprovado no Planejamento. O executor deve configurar de uma só vez no sistema escolhido:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Criação das etapas do Funil e Fluxos.</li><li>Criação de Campos Personalizados e Tags.</li><li>Configuração das Automações Padrões.</li><li>Setup dos Modelos de Mensagens Padrões (WhatsApp, Email, SMS).</li></ul><br><div class='mt-4 p-3 bg-white/5 border border-white/10 rounded text-sm text-gray-400'><i class='fa-solid fa-circle-info text-v4red mr-2'></i>Nota: Tudo deve ser configurado seguindo rigidamente o blueprint validado.</div>",
                     icon: "fa-solid fa-sliders",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 },
                 {
                     id: 6,
@@ -348,8 +353,7 @@
                     shortDesc: "Stress test de automações.",
                     fullDesc: "Tarefa focada exclusivamente em Qualidade (QA). O executor deve testar e validar o CRM fazendo testes de estresse em todas as automações criadas, simulando a jornada real de um Lead (Mistery Shopper) por todas as etapas do funil de vendas, garantindo que gatilhos operem perfeitamente.",
                     icon: "fa-solid fa-bug",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 },
                 {
                     id: 7,
@@ -357,8 +361,7 @@
                     shortDesc: "Capacitação da equipe na plataforma.",
                     fullDesc: "Realizar a call de treinamento de CRM com o cliente e sua equipe de vendas. Garantir que eles saibam na prática como: operar os cards do funil, preencher campos obrigatórios, adicionar notas, fazer leitura de tags e utilizar os atalhos de mensagens no dia a dia.",
                     icon: "fa-solid fa-person-rays",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 },
                 {
                     id: 8,
@@ -378,6 +381,7 @@
                     `,
                     icon: "fa-solid fa-lock",
                     isBlocker: true,
+                    alertTitle: "Atenção Crítica (Blocker)",
                     alertText: "OPERAÇÃO TRAVADA: As integrações finais (entrada de leads reais no sistema) SÓ PODEM SER ATIVADAS mediante a confirmação de recebimento da nota do NPS."
                 },
                 {
@@ -406,28 +410,275 @@
                         </div>
                     `,
                     icon: "fa-solid fa-stethoscope",
-                    isBlocker: false,
-                    alertText: ""
+                    isBlocker: false
                 }
             ];
 
-            let currentActiveId = null;
+            // ==========================================
+            // BASE DE DADOS 2: MANUAL DO DASHBOARD
+            // ==========================================
+            const manualSteps = [
+                {
+                    id: 1,
+                    title: "Visão Geral e Filtros",
+                    shortDesc: "Como navegar no painel de CS.",
+                    fullDesc: `
+                        O Dashboard foi construído para dar visão executiva e situacional das operações ativas.
+                        <div class="mt-6 space-y-4">
+                            <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                <h4 class="text-white font-bold text-sm mb-1"><i class="fa-solid fa-filter text-blue-400 mr-2"></i> Seletores Globais</h4>
+                                <p class="text-sm text-gray-400">Use os filtros superiores para refinar a visão por <strong class="text-gray-200">Cliente Específico</strong> ou por <strong class="text-gray-200">Modelo de Negócio</strong> (Recorrente vs. Avulso).</p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                <h4 class="text-white font-bold text-sm mb-1"><i class="fa-solid fa-calendar-days text-green-400 mr-2"></i> Filtros de Data</h4>
+                                <p class="text-sm text-gray-400">Todo o painel reage às datas escolhidas. O botão <strong class="text-gray-200">Todo o Período</strong> limpa as datas para buscar todo o histórico retido na API do Kommo CRM.</p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                <h4 class="text-white font-bold text-sm mb-1"><i class="fa-solid fa-file-pdf text-v4red mr-2"></i> Relatório One Page</h4>
+                                <p class="text-sm text-gray-400">O botão <strong class="text-gray-200">Baixar Relatório</strong> consolida a visão atual em um PDF dinâmico com insights acionáveis (Vitórias, Oportunidades e Plano de Ação).</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-map-location-dot",
+                    isBlocker: false
+                },
+                {
+                    id: 2,
+                    title: "Indicadores Resumo (Cards)",
+                    shortDesc: "Leitura dos cards superiores.",
+                    fullDesc: `
+                        Os quatro cartões no topo do painel reúnem o estado macrossintético da base de clientes sob gestão.
+                        <ul class="mt-5 space-y-4 text-sm text-gray-400">
+                            <li class="flex items-start gap-3">
+                                <div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
+                                <div><strong class="text-white">Total de Clientes:</strong> Quantidade absoluta de painéis sincronizados e totalizador de leads.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="w-2 h-2 rounded-full bg-green-500 mt-1.5 flex-shrink-0"></div>
+                                <div><strong class="text-white">Saudáveis:</strong> Operações sem alertas graves de inatividade ou estagnação.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="w-2 h-2 rounded-full bg-yellow-500 mt-1.5 flex-shrink-0"></div>
+                                <div><strong class="text-white">Em Atenção:</strong> Operações que começam a apresentar acúmulo leve de leads parados.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="w-2 h-2 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+                                <div><strong class="text-white">Em Risco:</strong> Operações com risco crônico (muito "Data Decay" ou zero usuários ativos).</div>
+                            </li>
+                        </ul>
+                    `,
+                    icon: "fa-solid fa-chart-simple",
+                    isBlocker: false
+                },
+                {
+                    id: 3,
+                    title: "Tabela Detalhada (Métricas)",
+                    shortDesc: "Como a IA classifica um cliente.",
+                    fullDesc: `
+                        A <strong class="text-white">Visão Detalhada dos Clientes</strong> (tabela principal) é o coração do dashboard. Ela expõe a saúde de cada funil de vendas.
+                        
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-[#111] p-4 rounded-lg border border-gray-800 border-l-4 border-l-blue-500">
+                                <h4 class="text-white font-bold text-sm mb-1">Ciclo Médio</h4>
+                                <p class="text-xs text-gray-400">Média de dias da criação do lead até o status "Ganho". <br><span class="text-green-400 font-medium">≤ 15d (Rápido)</span> | <span class="text-yellow-500 font-medium">≤ 45d (Médio)</span> | <span class="text-red-500 font-medium">> 45d (Lento)</span></p>
+                            </div>
+                            <div class="bg-[#111] p-4 rounded-lg border border-gray-800 border-l-4 border-l-yellow-500">
+                                <h4 class="text-white font-bold text-sm mb-1">Parados (>14d)</h4>
+                                <p class="text-xs text-gray-400">Leads sem nenhuma interação (nota, mudança de status ou mensagem) nas últimas duas semanas. Indica falta de follow-up.</p>
+                            </div>
+                            <div class="bg-[#111] p-4 rounded-lg border border-gray-800 border-l-4 border-l-purple-500">
+                                <h4 class="text-white font-bold text-sm mb-1">Data Decay (>30d)</h4>
+                                <p class="text-xs text-gray-400">O <strong>Data Decay</strong> é crítico: leads inativos há mais de um mês <strong>sem tarefa futura agendada</strong>. São oportunidades praticamente mortas consumindo espaço.</p>
+                            </div>
+                            <div class="bg-[#111] p-4 rounded-lg border border-gray-800 border-l-4 border-l-red-500">
+                                <h4 class="text-white font-bold text-sm mb-1">Tarefas Atrasadas</h4>
+                                <p class="text-xs text-gray-400">Atividades com data de execução no passado. Quanto maior este número, pior a disciplina do time de vendas.</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-table",
+                    isBlocker: true,
+                    alertTitle: "Como o Status de Saúde é calculado?",
+                    alertText: "A IA marca o cliente como 'Em Risco' (Vermelho) se o Decay for ≥ 5, se Parados for ≥ 15, ou se houver ZERO usuários ativos. Entra em 'Atenção' se o Decay for ≥ 1 ou Parados ≥ 5. Do contrário, fica 'Saudável'."
+                },
+                {
+                    id: 4,
+                    title: "Inteligência de Funil",
+                    shortDesc: "Leitura do pipeline horizontal.",
+                    fullDesc: `
+                        Ao selecionar um cliente e um funil específico, a seção **Detalhes do Funil** mostra o fluxo exato de conversão em tempo real.
+                        <ul class="mt-5 space-y-4 text-sm text-gray-400">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-arrow-right-arrow-left text-blue-400 mt-1 flex-shrink-0"></i>
+                                <div><strong class="text-white">Taxa de Conversão (Setas):</strong> As setas entre as etapas mostram qual o percentual de leads que <em>passaram</em> daquela etapa em relação à etapa anterior. Revela onde os leads estão sendo descartados mais rápido.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-stopwatch text-yellow-500 mt-1 flex-shrink-0"></i>
+                                <div><strong class="text-white">Tempo na Etapa:</strong> Mostra o tempo médio que os leads costumam estacionar em cada card do funil antes de se moverem.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check-double text-green-500 mt-1 flex-shrink-0"></i>
+                                <div><strong class="text-white">Vendas vs. Perdas:</strong> Os contadores inferiores agregam o total de ganhos/perdas absolutos e o percentual de Win Rate/Loss Rate do funil.</div>
+                            </li>
+                        </ul>
+                    `,
+                    icon: "fa-solid fa-filter-circle-dollar",
+                    isBlocker: false
+                },
+                {
+                    id: 5,
+                    title: "Gráficos Analíticos",
+                    shortDesc: "Motivos de perda e histórico mensal.",
+                    fullDesc: `
+                        A camada de *Analytics* oferece contexto temporal (tendência) sobre a operação do cliente selecionado.
+                        
+                        <div class="mt-6 space-y-5">
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-2 border-b border-gray-800 pb-1">Gráficos de Barras Mensais</h4>
+                                <p class="text-sm text-gray-400">Mostra evolução de volume (Leads vs. Vendas) e evolução de eficiência (Taxa de Conversão). Ideal para perceber sazonalidades ou se uma otimização no CRM refletiu em aumento de Win Rate.</p>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-2 border-b border-gray-800 pb-1">Ranking de Motivos de Perda</h4>
+                                <p class="text-sm text-gray-400">A lista elenca do maior ao menor motivo responsável pelas baixas no CRM. A IA do dashboard foi projetada para criticar fortemente o uso de motivos genéricos. Se a barra maior for <strong class="text-v4red">"Sem Motivo Registrado"</strong>, a inteligência de negócios está cega.</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-chart-pie",
+                    isBlocker: false
+                },
+                {
+                    id: 6,
+                    title: "One Page Report",
+                    shortDesc: "Como ler o relatório de saúde da IA.",
+                    fullDesc: `
+                        Ao clicar em <strong class="text-white">"Baixar Relatório"</strong>, a plataforma formata um relatório (PDF-ready) contendo a leitura estratégica da operação.
+                        
+                        <div class="mt-5 p-5 bg-[#14140b] border border-yellow-500/20 rounded-xl border-l-4 border-l-yellow-500">
+                            <h4 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-star text-yellow-500"></i> Score de 0 a 10 (Avaliação de Saúde)
+                            </h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                A nota é computada dinamicamente. Ela parte de uma base 7 ou 4 (dependendo da gravidade) e sofre acréscimos/punições. 
+                                <br><br>
+                                <strong class="text-green-500">+ Pontos:</strong> Conversão alta (>40%), Poucos estagnados (<50) e Ciclo ágil (<5d).<br>
+                                <strong class="text-red-500">- Pontos:</strong> Perda crítica (>80%) ou excesso de leads abandonados (>200).
+                            </p>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-5">
+                            O relatório também gera parágrafos automáticos de <strong class="text-white">Vitórias</strong> (quando acerta nas métricas), <strong class="text-white">Oportunidades</strong> (gargalos identificados) e um <strong class="text-white">Plano de Ação Executivo</strong> prescritivo.
+                        </p>
+                    `,
+                    icon: "fa-solid fa-file-invoice",
+                    isBlocker: false
+                },
+                {
+                    id: 7,
+                    title: "Faturamento Kommo",
+                    shortDesc: "Controle de vigência das licenças.",
+                    fullDesc: `
+                        No rodapé do painel, a seção <strong class="text-white">Status das Licenças Kommo CRM</strong> garante que o ecossistema tecnológico não seja desligado por falta de pagamento.
+                        <ul class="mt-5 space-y-4 text-sm text-gray-400">
+                            <li class="flex items-start gap-3">
+                                <span class="bg-green-500/20 text-green-500 px-2 py-0.5 rounded text-[10px] font-bold mt-0.5">OK</span>
+                                <div>Licenças vigentes com mais de 5 dias até a expiração.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded text-[10px] font-bold mt-0.5">AVISO</span>
+                                <div>A licença do cliente expira em <strong class="text-white">5 dias ou menos</strong>, ou a data não foi configurada. Enviar lembrete financeiro.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="bg-red-500/20 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold mt-0.5">CRÍTICO</span>
+                                <div>A licença já expirou (dias restantes negativos). Acesso ao CRM provavelmente bloqueado.</div>
+                            </li>
+                        </ul>
+                    `,
+                    icon: "fa-solid fa-credit-card",
+                    isBlocker: false
+                }
+            ];
 
             // ==========================================
-            // Lógica de Renderização e Interação POP
+            // Lógica de Renderização e Interação Dinâmica
             // ==========================================
+            let currentMode = 'pop'; // 'pop' or 'manual'
+            let activeIdPop = null;
+            let activeIdManual = null;
+
+            const btnModePop = document.getElementById('btn-mode-pop');
+            const btnModeManual = document.getElementById('btn-mode-manual');
+            const sidebarTitle = document.getElementById('sidebar-title');
+            
+            // Textos Iniciais
+            const texts = {
+                pop: {
+                    title: "Fases do Projeto",
+                    welcomeTitle: "Bem-vindo ao Novo Fluxo",
+                    welcomeDesc: "Selecione uma etapa no menu à esquerda para visualizar os detalhes, instruções e requisitos do procedimento padrão.",
+                    welcomeIcon: "fa-solid fa-route",
+                    descTitle: "Instruções e Documentação",
+                    showFooter: true
+                },
+                manual: {
+                    title: "Capítulos do Manual",
+                    welcomeTitle: "Manual do Dashboard",
+                    welcomeDesc: "Selecione um tópico à esquerda para entender o funcionamento mecânico das tabelas, funis e regras de negócio da IA.",
+                    welcomeIcon: "fa-solid fa-book-open-reader",
+                    descTitle: "Mecânicas e Funcionalidades",
+                    showFooter: false
+                }
+            };
+
             function initApp() {
-                document.getElementById('total-steps-badge').textContent = processSteps.length + ' Etapas';
-                document.getElementById('total-steps-count').textContent = processSteps.length;
-                renderTimeline();
+                switchMode('pop');
             }
 
-            function renderTimeline() {
+            function switchMode(mode) {
+                currentMode = mode;
+                const data = mode === 'pop' ? popSteps : manualSteps;
+                const uiTexts = texts[mode];
+
+                // Atualizar Botões Toggle
+                if (mode === 'pop') {
+                    btnModePop.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 bg-v4red text-white shadow-lg shadow-red-900/40";
+                    btnModeManual.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5";
+                } else {
+                    btnModeManual.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 bg-v4red text-white shadow-lg shadow-red-900/40";
+                    btnModePop.className = "flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5";
+                }
+
+                // Atualizar Textos Estáticos
+                sidebarTitle.textContent = uiTexts.title;
+                document.getElementById('total-steps-badge').textContent = data.length + (mode === 'pop' ? ' Etapas' : ' Capítulos');
+                document.getElementById('total-steps-count').textContent = data.length;
+                document.getElementById('welcome-title').textContent = uiTexts.welcomeTitle;
+                document.getElementById('welcome-desc').textContent = uiTexts.welcomeDesc;
+                document.getElementById('welcome-icon').className = uiTexts.welcomeIcon + " text-4xl text-v4red opacity-80 animate-bounce";
+                document.getElementById('card-desc-title').textContent = uiTexts.descTitle;
+                
+                // Mostrar/Ocultar Rodapé do Card
+                const footer = document.getElementById('card-footer');
+                if (uiTexts.showFooter) footer.classList.remove('hidden');
+                else footer.classList.add('hidden');
+
+                // Renderizar a Timeline correta
+                renderTimeline(data);
+
+                // Voltar para a tela de Welcome
+                const welcomeView = document.getElementById('welcome-view');
+                const card = document.getElementById('detail-card');
+                
+                card.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+                card.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+                
+                welcomeView.classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            function renderTimeline(data) {
                 const container = document.getElementById('timeline-container');
                 container.innerHTML = '';
 
-                processSteps.forEach((step, index) => {
-                    const isLast = index === processSteps.length - 1;
+                data.forEach((step, index) => {
+                    const isLast = index === data.length - 1;
                     
                     const stepEl = document.createElement('div');
                     stepEl.id = `step-container-${step.id}`;
@@ -435,6 +686,7 @@
                     stepEl.onclick = () => selectStep(step.id);
 
                     const lineHtml = !isLast ? `<div class="absolute left-[2.15rem] top-12 bottom-[-16px] w-0.5 bg-white/5 group-hover:bg-white/10 transition-colors z-0"></div>` : '';
+                    const blockerBadge = step.isBlocker ? '<span class="inline-block mt-2 text-[10px] bg-v4red/20 border border-v4red/30 text-v4red px-2 py-0.5 rounded font-bold uppercase tracking-wider">Atenção</span>' : '';
 
                     stepEl.innerHTML = `
                         ${lineHtml}
@@ -449,23 +701,25 @@
                                 </h3>
                             </div>
                             <p class="text-xs text-gray-500 mt-1 line-clamp-1">${step.shortDesc}</p>
-                            ${step.isBlocker ? '<span class="inline-block mt-2 text-[10px] bg-v4red/20 border border-v4red/30 text-v4red px-2 py-0.5 rounded font-bold uppercase tracking-wider">Blocker</span>' : ''}
+                            ${blockerBadge}
                         </div>
                     `;
                     container.appendChild(stepEl);
                 });
             }
 
-            // Expor função globalmente para os onclicks
             window.selectStep = function(id) {
-                const step = processSteps.find(s => s.id === id);
+                const data = currentMode === 'pop' ? popSteps : manualSteps;
+                const step = data.find(s => s.id === id);
                 if (!step) return;
 
-                // 1. Resetar estados anteriores
-                if (currentActiveId) {
-                    const prevContainer = document.getElementById(`step-container-${currentActiveId}`);
-                    const prevBubble = document.getElementById(`bubble-${currentActiveId}`);
-                    const prevTitle = document.getElementById(`title-${currentActiveId}`);
+                const activeId = currentMode === 'pop' ? activeIdPop : activeIdManual;
+
+                // 1. Resetar estado anterior
+                if (activeId) {
+                    const prevContainer = document.getElementById(`step-container-${activeId}`);
+                    const prevBubble = document.getElementById(`bubble-${activeId}`);
+                    const prevTitle = document.getElementById(`title-${activeId}`);
                     
                     if(prevContainer) {
                         prevContainer.classList.remove('bg-white/5', 'border-white/10');
@@ -499,7 +753,9 @@
                     activeTitle.classList.add('text-white');
                 }
 
-                currentActiveId = id;
+                // Atualizar rastreador ativo
+                if (currentMode === 'pop') activeIdPop = id;
+                else activeIdManual = id;
 
                 // 3. Atualizar o Card de Detalhes
                 const welcomeView = document.getElementById('welcome-view');
@@ -519,7 +775,8 @@
                     document.getElementById('card-desc').innerHTML = step.fullDesc;
 
                     const alertBox = document.getElementById('card-alert');
-                    if (step.isBlocker) {
+                    if (step.isBlocker && step.alertText) {
+                        document.getElementById('card-alert-title').textContent = step.alertTitle || "Atenção Crítica";
                         document.getElementById('card-alert-text').textContent = step.alertText;
                         alertBox.classList.remove('hidden');
                     } else {
@@ -532,6 +789,10 @@
                     card.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
                 }, 200);
             }
+
+            // Listeners dos Botões de Modo
+            btnModePop.addEventListener('click', () => { if(currentMode !== 'pop') switchMode('pop'); });
+            btnModeManual.addEventListener('click', () => { if(currentMode !== 'manual') switchMode('manual'); });
 
             initApp();
         });
