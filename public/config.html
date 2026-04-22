@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Discovery AI V4</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sidebar: '#000000',
+                        mainbg: '#1a0404',
+                        cardbg: 'rgba(0, 0, 0, 0.4)',
+                        cardhover: 'rgba(0, 0, 0, 0.6)',
+                        v4red: '#dc2626',
+                        v4redhover: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar Premium */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; transition: background 0.2s;}
+        ::-webkit-scrollbar-thumb:hover { background: rgba(220,38,38,0.5); }
+
+        /* Fundo Padrão Premium V4 */
+        .bg-pattern {
+            position: absolute; inset: 0; opacity: 0.025;
+            background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none; z-index: 0;
+        }
+
+        /* EFEITOS DE FUNDO (AMBIENT GLOW) */
+        .glow-effect {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(220,38,38,0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px);
+        }
+        .glow-left { top: -100px; left: -100px; opacity: 0.8; }
+        .glow-right { bottom: 20%; right: -200px; opacity: 0.5; background: radial-gradient(circle, rgba(220,38,38,0.1) 0%, rgba(0,0,0,0) 70%); }
+
+        /* Animações UI Nativas */
+        .fade-in-up { animation: fadeUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        
+        /* Transição Suave Cards */
+        .step-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Area interna com scroll invisível mas utilizável */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-mainbg font-inter text-gray-200 relative">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden w-full bg-sidebar border-b border-white/5 px-6 py-4 flex justify-between items-center z-40 relative flex-shrink-0 shadow-lg">
+        <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="h-6 sm:h-8 object-contain drop-shadow-md" />
+        <button id="mobile-menu-btn" class="text-gray-300 hover:text-white text-2xl focus:outline-none transition-colors">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Overlay da Sidebar Mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/70 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Sidebar Lateral -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-50 shadow-2xl border-r border-white/5 transition-transform duration-300 ease-in-out">
+        
+        <button id="close-sidebar-btn" class="lg:hidden absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors focus:outline-none">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="w-full flex flex-col">
+            <div class="w-full flex justify-center px-8 mb-12 mt-2">
+                <div class="w-full flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer">
+                    <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="max-w-full h-9 object-contain drop-shadow-md" />
+                </div>
+            </div>
+
+            <nav class="flex flex-col w-full px-6 space-y-2">
+                <a href="index.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-chart-pie text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Dashboard</span>
+                </a>
+                
+                <a href="planejamentos.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-bullhorn text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Planejamentos</span>
+                </a>
+                
+                <a href="discovery.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-file-lines text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Discovery</span>
+                </a>
+
+                <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Discovery AI V4</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sidebar: '#000000',
+                        mainbg: '#1a0404',
+                        cardbg: 'rgba(0, 0, 0, 0.4)',
+                        cardhover: 'rgba(0, 0, 0, 0.6)',
+                        v4red: '#dc2626',
+                        v4redhover: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar Premium */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; transition: background 0.2s;}
+        ::-webkit-scrollbar-thumb:hover { background: rgba(220,38,38,0.5); }
+
+        /* Fundo Padrão Premium V4 */
+        .bg-pattern {
+            position: absolute; inset: 0; opacity: 0.025;
+            background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none; z-index: 0;
+        }
+
+        /* EFEITOS DE FUNDO (AMBIENT GLOW) */
+        .glow-effect {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(220,38,38,0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px);
+        }
+        .glow-left { top: -100px; left: -100px; opacity: 0.8; }
+        .glow-right { bottom: 20%; right: -200px; opacity: 0.5; background: radial-gradient(circle, rgba(220,38,38,0.1) 0%, rgba(0,0,0,0) 70%); }
+
+        /* Animações UI Nativas */
+        .fade-in-up { animation: fadeUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        
+        /* Transição Suave Cards */
+        .step-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Area interna com scroll invisível mas utilizável */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-mainbg font-inter text-gray-200 relative">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden w-full bg-sidebar border-b border-white/5 px-6 py-4 flex justify-between items-center z-40 relative flex-shrink-0 shadow-lg">
+        <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="h-6 sm:h-8 object-contain drop-shadow-md" />
+        <button id="mobile-menu-btn" class="text-gray-300 hover:text-white text-2xl focus:outline-none transition-colors">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Overlay da Sidebar Mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/70 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Sidebar Lateral -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-72 bg-sidebar h-full flex flex-col justify-between py-8 flex-shrink-0 z-50 shadow-2xl border-r border-white/5 transition-transform duration-300 ease-in-out">
+        
+        <button id="close-sidebar-btn" class="lg:hidden absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors focus:outline-none">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="w-full flex flex-col">
+            <div class="w-full flex justify-center px-8 mb-12 mt-2">
+                <div class="w-full flex items-center justify-center transition-transform hover:scale-105 duration-300 cursor-pointer">
+                    <img src="https://carreira.inhire.com.br/wp-content/uploads/2024/04/v4company-02-03-1024x279.png" alt="Logo V4 Company" class="max-w-full h-9 object-contain drop-shadow-md" />
+                </div>
+            </div>
+
+            <nav class="flex flex-col w-full px-6 space-y-2">
+                <a href="index.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-chart-pie text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Dashboard</span>
+                </a>
+                
+                <a href="planejamentos.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-bullhorn text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Planejamentos</span>
+                </a>
+                
+                <a href="discovery.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent transition-all duration-300 group focus:outline-none">
+                    <i class="fa-solid fa-file-lines text-lg group-hover:text-red-400 transition-colors w-6"></i>
+                    <span class="font-medium tracking-wide text-sm group-hover:translate-x-1 transition-transform">Discovery</span>
+                </a>
+
+                <div class="pt-4 mt-2 border-t border-white/5">
+                    <!-- Configurações ATIVO -->
+                    <a href="configuracoes.html" class="w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-white bg-gradient-to-r from-red-900/40 to-transparent border-l-4 border-v4red shadow-sm transition-all duration-300 focus:outline-none">
+                        <i class="fa-solid fa-gear text-lg text-v4red w-6"></i>
+                        <span class="font-medium tracking-wide text-sm">Configurações</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="px-6 w-full mt-auto">
+            <button class="flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group focus:outline-none">
+                <img src="https://i.pravatar.cc/150?img=11" alt="Avatar Usuário" class="w-10 h-10 rounded-full border-2 border-gray-700 group-hover:border-v4red transition-colors object-cover">
+                <div class="flex flex-col flex-1 overflow-hidden">
+                    <span class="text-white text-sm font-semibold truncate">João Silva</span>
+                    <span class="text-gray-500 text-xs truncate">Gestor de Tráfego</span>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-500 group-hover:text-white transition-colors px-2"></i>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full w-full relative overflow-hidden flex flex-col font-inter z-10">
+        <div class="bg-pattern"></div>
+        <div class="glow-effect glow-left"></div>
+        <div class="glow-effect glow-right"></div>
+
+        <div class="flex-1 overflow-y-auto px-4 sm:px-8 pb-10 flex flex-col">
+            
+            <header class="flex flex-col md:flex-row justify-between items-center py-6 sm:py-8 mb-4 border-b border-white/5 gap-6 md:gap-0 relative z-20">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-2 w-full md:w-auto text-center md:text-left">
+                    <h2 class="text-white text-xl sm:text-2xl font-sans font-bold tracking-wide flex items-center gap-3">
+                        <i class="fa-solid fa-rocket text-v4red"></i> POP | Implementação de CRM
+                    </h2>
+                    <div class="hidden md:flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 md:ml-4 mt-1">
+                        <div class="w-2 h-2 bg-v4red rounded-full animate-pulse"></div>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Processo v2.0</span>
+                    </div>
+                </div>
+                
+                <a href="https://wa.me/5512992140358" target="_blank" class="w-full md:w-auto justify-center bg-white/5 border border-white/10 hover:border-v4red hover:bg-v4red/10 text-white px-5 py-3 md:py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300">
+                    <i class="fa-solid fa-headset text-v4red"></i> Suporte V4
+                </a>
+            </header>
+
+            <!-- Container Principal do POP -->
+            <section class="fade-in-up flex-1 flex flex-col md:flex-row gap-6 relative z-20 h-full max-h-[85vh]">
+                
+                <!-- Coluna Esquerda: Timeline -->
+                <div class="w-full md:w-1/3 lg:w-1/4 bg-cardbg border border-white/5 rounded-3xl backdrop-blur-md flex flex-col overflow-hidden shadow-2xl">
+                    <div class="p-6 pb-4 border-b border-white/5 bg-black/20 flex justify-between items-center">
+                        <h3 class="text-white font-sans font-bold text-lg">Fases do Projeto</h3>
+                        <span id="total-steps-badge" class="bg-v4red/20 text-v4red border border-v4red/30 px-2.5 py-1 rounded-full text-xs font-bold"></span>
+                    </div>
+                    
+                    <div id="timeline-container" class="flex-1 overflow-y-auto p-4 space-y-1">
+                        <!-- Itens renderizados via JS -->
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Detalhes -->
+                <div class="w-full md:w-2/3 lg:w-3/4 bg-cardbg border border-white/5 rounded-3xl backdrop-blur-md flex flex-col overflow-hidden shadow-2xl relative">
+                    
+                    <!-- Estado Inicial (Welcome) -->
+                    <div id="welcome-view" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-500 z-10">
+                        <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                            <i class="fa-solid fa-route text-4xl text-v4red opacity-80 animate-bounce"></i>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-sans font-bold mb-4 text-white">Bem-vindo ao Novo Fluxo</h2>
+                        <p class="text-gray-400 text-sm sm:text-base max-w-lg leading-relaxed">
+                            Simplificamos as tarefas para o executor. Selecione uma etapa no menu à esquerda para visualizar os detalhes, bloqueios e requisitos de cada fase da implementação do CRM.
+                        </p>
+                    </div>
+
+                    <!-- Card de Detalhes (Escondido inicialmente) -->
+                    <div id="detail-card" class="absolute inset-0 flex flex-col overflow-y-auto opacity-0 pointer-events-none transform scale-95 transition-all duration-500 z-20 bg-black/20">
+                        
+                        <!-- Cabeçalho do Card -->
+                        <div class="p-8 pb-6 border-b border-white/5 relative bg-gradient-to-b from-black/40 to-transparent">
+                            <div class="absolute top-0 right-0 bg-v4red text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider shadow-lg shadow-red-900/50">
+                                Passo <span id="card-step-number"></span> de <span id="total-steps-count"></span>
+                            </div>
+                            
+                            <div class="flex items-center gap-5 mt-2">
+                                <div id="card-icon-container" class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-v4red text-2xl shadow-inner">
+                                    <!-- Icon -->
+                                </div>
+                                <h2 id="card-title" class="text-2xl sm:text-3xl font-sans font-bold text-white">Título</h2>
+                            </div>
+                        </div>
+
+                        <!-- Corpo do Card -->
+                        <div class="p-8 flex-1">
+                            
+                            <!-- Box de Alerta (Blocagem) -->
+                            <div id="card-alert" class="hidden mb-8 bg-v4red/10 border-l-4 border-v4red p-5 rounded-r-xl shadow-md">
+                                <div class="flex items-start gap-4">
+                                    <i class="fa-solid fa-circle-exclamation text-v4red text-2xl mt-0.5"></i>
+                                    <div>
+                                        <h4 class="text-v4red font-bold text-sm uppercase mb-1 tracking-wide">Atenção Crítica (Blocker)</h4>
+                                        <p id="card-alert-text" class="text-gray-300 text-sm leading-relaxed"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Descrição -->
+                            <div class="mb-8">
+                                <h3 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-4 border-b border-white/10 pb-2">Instruções e Documentação da Tarefa</h3>
+                                <div id="card-desc" class="text-base text-gray-300 leading-relaxed font-light"></div>
+                            </div>
+
+                            <!-- Rodapé do Card (Infos Adicionais) -->
+                            <div class="bg-black/40 rounded-xl p-5 border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-white/5 text-gray-400 p-3 rounded-full border border-white/5">
+                                        <i class="fa-regular fa-calendar-check text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">Prazo de Execução</h4>
+                                        <p class="text-xs text-gray-500 mt-0.5">A ser definido e alinhado em contrato/kick-off</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white/5 border border-white/10 px-4 py-2 rounded-lg shadow-sm text-xs font-semibold text-v4red whitespace-nowrap">
+                                    Data: Acordada com Cliente
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ==========================================
+            // Lógica do Menu Mobile
+            // ==========================================
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+            function toggleSidebar() {
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.remove('hidden');
+                    setTimeout(() => sidebarOverlay.classList.add('opacity-100'), 10);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.remove('opacity-100');
+                    setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+                }
+            }
+
+            mobileMenuBtn?.addEventListener('click', toggleSidebar);
+            closeSidebarBtn?.addEventListener('click', toggleSidebar);
+            sidebarOverlay?.addEventListener('click', toggleSidebar);
+
+            // ==========================================
+            // DADOS DO POP (Mapeados para Dark Mode e FontAwesome)
+            // ==========================================
+            const processSteps = [
+                {
+                    id: 1,
+                    title: "Growth Class (Kick-off)",
+                    shortDesc: "Reunião inaugural de alinhamento.",
+                    fullDesc: `
+                        A <strong class="text-white font-medium">Growth Class</strong> é o marco zero da implementação. Momento essencial para recalibrar expectativas, alinhar o escopo e definir as responsabilidades do cliente.
+                        <div class="mt-5 p-5 bg-black/40 border border-white/10 rounded-xl">
+                            <h4 class="font-bold text-white mb-4 text-sm flex items-center gap-2 uppercase tracking-wide">
+                                <i class="fa-solid fa-list-check text-v4red"></i> Roteiro da Reunião (Pauta)
+                            </h4>
+                            <ul class="list-none space-y-3 text-sm text-gray-400">
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Apresentação & Fluxo:</strong> Apresentar o time do projeto, canais de comunicação e explicar as fases da implementação.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Balizamento de Escopo:</strong> Explicar claramente o que a implementação abrange e o que fica de fora (ex: CRM não fará as vendas pelo time).</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Responsabilidades do Cliente:</strong> Garantir que o cliente saiba que depende dele o preenchimento de formulários e aprovação de blueprints.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-person-chalkboard",
+                    isBlocker: true,
+                    alertText: "NÃO AVANÇAR SEM ESSA CALL. Apenas prossiga após o cliente assinar ou dar o 'de acordo' nas premissas alinhadas nesta etapa."
+                },
+                {
+                    id: 2,
+                    title: "Discovery Técnico",
+                    shortDesc: "Imersão no negócio do cliente.",
+                    fullDesc: "Realizar a <strong class='text-white'>Call de Discovery</strong> e aplicar formulários. O objetivo principal desta tarefa é coletar, ouvir e confirmar todas as informações estratégicas sobre o segmento, modelo de negócios, jornada atual do lead e requisitos técnicos do cliente.",
+                    icon: "fa-solid fa-phone-volume",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 3,
+                    title: "Planejamento de CRM",
+                    shortDesc: "Documento detalhado de funil e usuários.",
+                    fullDesc: "Montar um documento de planejamento (Blueprint) de CRM detalhado. Este documento deve obrigatoriamente conter:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Mapeamento das Etapas de Funil.</li><li>Definição e número de usuários que acessarão a plataforma.</li><li>Desenho de todas as automações necessárias.</li><li>Textos e Modelos de Mensagens Padrões.</li></ul>",
+                    icon: "fa-solid fa-pen-ruler",
+                    isBlocker: true,
+                    alertText: "ESSA TAREFA SÓ DEVERÁ SER CONCLUÍDA APÓS O CLIENTE APROVAR. Para dar início às próximas tarefas, precisamos deste documento aprovado e validado formalmente pelo cliente."
+                },
+                {
+                    id: 4,
+                    title: "Contratação da Plataforma",
+                    shortDesc: "Criar contas e assinar plano.",
+                    fullDesc: "Após o planejamento de CRM ser aprovado, realizar a criação da conta e a contratação da plataforma de CRM escolhida. Iniciar pelo menos no plano grátis de testes ou período de trial, garantindo acesso completo à equipe executora.",
+                    icon: "fa-solid fa-credit-card",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 5,
+                    title: "Configuração Unificada",
+                    shortDesc: "Implementar fluxos e automações.",
+                    fullDesc: "<strong class='text-white'>Tarefa Unificada:</strong> Aqui centralizamos a execução do que foi aprovado no Planejamento. O executor deve configurar de uma só vez no sistema escolhido:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Criação das etapas do Funil e Fluxos.</li><li>Criação de Campos Personalizados e Tags.</li><li>Configuração das Automações Padrões.</li><li>Setup dos Modelos de Mensagens Padrões (WhatsApp, Email, SMS).</li></ul><br><div class='mt-4 p-3 bg-white/5 border border-white/10 rounded text-sm text-gray-400'><i class='fa-solid fa-circle-info text-v4red mr-2'></i>Nota: Tudo deve ser configurado seguindo rigidamente o blueprint validado.</div>",
+                    icon: "fa-solid fa-sliders",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 6,
+                    title: "Testes e Validação",
+                    shortDesc: "Stress test de automações.",
+                    fullDesc: "Tarefa focada exclusivamente em Qualidade (QA). O executor deve testar e validar o CRM fazendo testes de estresse em todas as automações criadas, simulando a jornada real de um Lead (Mistery Shopper) por todas as etapas do funil de vendas, garantindo que gatilhos operem perfeitamente.",
+                    icon: "fa-solid fa-bug",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 7,
+                    title: "Treinamento",
+                    shortDesc: "Capacitação da equipe na plataforma.",
+                    fullDesc: "Realizar a call de treinamento de CRM com o cliente e sua equipe de vendas. Garantir que eles saibam na prática como: operar os cards do funil, preencher campos obrigatórios, adicionar notas, fazer leitura de tags e utilizar os atalhos de mensagens no dia a dia.",
+                    icon: "fa-solid fa-person-rays",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 8,
+                    title: "Gate de NPS (Trava)",
+                    shortDesc: "Liberação após pesquisa.",
+                    fullDesc: `
+                        O <strong class="text-white font-medium">Gate de NPS</strong> atua como a barreira final de qualidade antes de liberarmos as chaves do carro para o cliente dirigir.
+                        <div class="mt-5 p-5 bg-black/40 border-l-4 border-v4red rounded-r-xl shadow-md">
+                            <h4 class="font-bold text-white mb-2 uppercase text-xs tracking-wider">Protocolo de Ativação (Go-Live)</h4>
+                            <p class="text-sm text-gray-400 mb-4">A ativação oficial das automações em ambiente de produção só deverá ocorrer <strong class="text-white">após</strong> o preenchimento da pesquisa de NPS pelo cliente avaliando a implementação.</p>
+                            <ol class="list-decimal pl-4 space-y-2 text-sm text-gray-300">
+                                <li>Disparo do Link/Formulário de NPS pós-treinamento.</li>
+                                <li>Monitoramento do preenchimento e leitura da nota/feedback.</li>
+                                <li>Desbloqueio: Ativação definitiva das campanhas e do fluxo de entrada.</li>
+                            </ol>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-lock",
+                    isBlocker: true,
+                    alertText: "OPERAÇÃO TRAVADA: As integrações finais (entrada de leads reais no sistema) SÓ PODEM SER ATIVADAS mediante a confirmação de recebimento da nota do NPS."
+                },
+                {
+                    id: 9,
+                    title: "Auditoria Mensal",
+                    shortDesc: "Manutenção pós Go-Live.",
+                    fullDesc: `
+                        Fase Contínua. Uma vez entregue, o ecossistema de CRM precisa de monitoramento ativo. Execute este checklist <strong class="text-white">1x por mês</strong>.
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> Saúde do Número</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Revisar Meta Business Suite: status de bloqueio, taxa de quality rating e status de templates.</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-plug text-blue-500 text-lg"></i> Conexões e APIs</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Checar os logs de integrações. Reconectar acessos nativos expirados (ex: Token FB).</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-robot text-purple-500 text-lg"></i> Automações Ativas</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Inserir 1 lead "espião" para garantir que gatilhos e disparos estão operando sem falhas.</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-broom text-v4red text-lg"></i> Higiene da Base</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Auditar excesso de leads atrasados, remover duplicados e garantir padronização de Tags.</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-stethoscope",
+                    isBlocker: false,
+                    alertText: ""
+                }
+            ];
+
+            let currentActiveId = null;
+
+            // ==========================================
+            // Lógica de Renderização e Interação POP
+            // ==========================================
+            function initApp() {
+                document.getElementById('total-steps-badge').textContent = processSteps.length + ' Etapas';
+                document.getElementById('total-steps-count').textContent = processSteps.length;
+                renderTimeline();
+            }
+
+            function renderTimeline() {
+                const container = document.getElementById('timeline-container');
+                container.innerHTML = '';
+
+                processSteps.forEach((step, index) => {
+                    const isLast = index === processSteps.length - 1;
+                    
+                    const stepEl = document.createElement('div');
+                    stepEl.id = `step-container-${step.id}`;
+                    stepEl.className = 'relative flex gap-4 p-3 rounded-xl cursor-pointer group step-transition border border-transparent hover:bg-white/5 hover:border-white/10';
+                    stepEl.onclick = () => selectStep(step.id);
+
+                    const lineHtml = !isLast ? `<div class="absolute left-[2.15rem] top-12 bottom-[-16px] w-0.5 bg-white/5 group-hover:bg-white/10 transition-colors z-0"></div>` : '';
+
+                    stepEl.innerHTML = `
+                        ${lineHtml}
+                        <div id="bubble-${step.id}" class="w-11 h-11 rounded-xl border border-white/10 bg-black/50 flex items-center justify-center flex-shrink-0 z-10 transition-all duration-300 text-gray-500 group-hover:text-white group-hover:border-v4red/50 shadow-sm">
+                            <i class="${step.icon} text-lg"></i>
+                        </div>
+                        
+                        <div class="pb-2 pt-1 flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 id="title-${step.id}" class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">
+                                    ${step.id}. ${step.title}
+                                </h3>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 line-clamp-1">${step.shortDesc}</p>
+                            ${step.isBlocker ? '<span class="inline-block mt-2 text-[10px] bg-v4red/20 border border-v4red/30 text-v4red px-2 py-0.5 rounded font-bold uppercase tracking-wider">Blocker</span>' : ''}
+                        </div>
+                    `;
+                    container.appendChild(stepEl);
+                });
+            }
+
+            // Expor função globalmente para os onclicks
+            window.selectStep = function(id) {
+                const step = processSteps.find(s => s.id === id);
+                if (!step) return;
+
+                // 1. Resetar estados anteriores
+                if (currentActiveId) {
+                    const prevContainer = document.getElementById(`step-container-${currentActiveId}`);
+                    const prevBubble = document.getElementById(`bubble-${currentActiveId}`);
+                    const prevTitle = document.getElementById(`title-${currentActiveId}`);
+                    
+                    if(prevContainer) {
+                        prevContainer.classList.remove('bg-white/5', 'border-white/10');
+                        prevContainer.classList.add('border-transparent');
+                    }
+                    if (prevBubble) {
+                        prevBubble.classList.remove('bg-v4red', 'border-v4red', 'text-white', 'shadow-[0_0_15px_rgba(220,38,38,0.4)]');
+                        prevBubble.classList.add('bg-black/50', 'border-white/10', 'text-gray-500');
+                    }
+                    if (prevTitle) {
+                        prevTitle.classList.remove('text-white');
+                        prevTitle.classList.add('text-gray-300');
+                    }
+                }
+
+                // 2. Setar novo estado ativo
+                const activeContainer = document.getElementById(`step-container-${id}`);
+                const activeBubble = document.getElementById(`bubble-${id}`);
+                const activeTitle = document.getElementById(`title-${id}`);
+                
+                if(activeContainer) {
+                    activeContainer.classList.remove('border-transparent');
+                    activeContainer.classList.add('bg-white/5', 'border-white/10');
+                }
+                if (activeBubble) {
+                    activeBubble.classList.remove('bg-black/50', 'border-white/10', 'text-gray-500');
+                    activeBubble.classList.add('bg-v4red', 'border-v4red', 'text-white', 'shadow-[0_0_15px_rgba(220,38,38,0.4)]');
+                }
+                if (activeTitle) {
+                    activeTitle.classList.remove('text-gray-300');
+                    activeTitle.classList.add('text-white');
+                }
+
+                currentActiveId = id;
+
+                // 3. Atualizar o Card de Detalhes
+                const welcomeView = document.getElementById('welcome-view');
+                const card = document.getElementById('detail-card');
+                
+                welcomeView.classList.add('opacity-0');
+                setTimeout(() => welcomeView.classList.add('pointer-events-none'), 300);
+                
+                // Animação de entrada do card
+                card.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+                card.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+
+                setTimeout(() => {
+                    document.getElementById('card-step-number').textContent = step.id;
+                    document.getElementById('card-title').textContent = step.title;
+                    document.getElementById('card-icon-container').innerHTML = `<i class="${step.icon}"></i>`;
+                    document.getElementById('card-desc').innerHTML = step.fullDesc;
+
+                    const alertBox = document.getElementById('card-alert');
+                    if (step.isBlocker) {
+                        document.getElementById('card-alert-text').textContent = step.alertText;
+                        alertBox.classList.remove('hidden');
+                    } else {
+                        alertBox.classList.add('hidden');
+                    }
+
+                    // Trigger reflow
+                    void card.offsetWidth;
+                    card.classList.remove('scale-95', 'opacity-0', 'pointer-events-none');
+                    card.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+                }, 200);
+            }
+
+            initApp();
+        });
+    </script>
+</body>
+</html>
+            </nav>
+        </div>
+
+        <div class="px-6 w-full mt-auto">
+            <button class="flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group focus:outline-none">
+                <img src="https://i.pravatar.cc/150?img=11" alt="Avatar Usuário" class="w-10 h-10 rounded-full border-2 border-gray-700 group-hover:border-v4red transition-colors object-cover">
+                <div class="flex flex-col flex-1 overflow-hidden">
+                    <span class="text-white text-sm font-semibold truncate">João Silva</span>
+                    <span class="text-gray-500 text-xs truncate">Gestor de Tráfego</span>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-500 group-hover:text-white transition-colors px-2"></i>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full w-full relative overflow-hidden flex flex-col font-inter z-10">
+        <div class="bg-pattern"></div>
+        <div class="glow-effect glow-left"></div>
+        <div class="glow-effect glow-right"></div>
+
+        <div class="flex-1 overflow-y-auto px-4 sm:px-8 pb-10 flex flex-col">
+            
+            <header class="flex flex-col md:flex-row justify-between items-center py-6 sm:py-8 mb-4 border-b border-white/5 gap-6 md:gap-0 relative z-20">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-2 w-full md:w-auto text-center md:text-left">
+                    <h2 class="text-white text-xl sm:text-2xl font-sans font-bold tracking-wide flex items-center gap-3">
+                        <i class="fa-solid fa-rocket text-v4red"></i> POP | Implementação de CRM
+                    </h2>
+                    <div class="hidden md:flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 md:ml-4 mt-1">
+                        <div class="w-2 h-2 bg-v4red rounded-full animate-pulse"></div>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Processo v2.0</span>
+                    </div>
+                </div>
+                
+                <a href="https://wa.me/5512992140358" target="_blank" class="w-full md:w-auto justify-center bg-white/5 border border-white/10 hover:border-v4red hover:bg-v4red/10 text-white px-5 py-3 md:py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300">
+                    <i class="fa-solid fa-headset text-v4red"></i> Suporte V4
+                </a>
+            </header>
+
+            <!-- Container Principal do POP -->
+            <section class="fade-in-up flex-1 flex flex-col md:flex-row gap-6 relative z-20 h-full max-h-[85vh]">
+                
+                <!-- Coluna Esquerda: Timeline -->
+                <div class="w-full md:w-1/3 lg:w-1/4 bg-cardbg border border-white/5 rounded-3xl backdrop-blur-md flex flex-col overflow-hidden shadow-2xl">
+                    <div class="p-6 pb-4 border-b border-white/5 bg-black/20 flex justify-between items-center">
+                        <h3 class="text-white font-sans font-bold text-lg">Fases do Projeto</h3>
+                        <span id="total-steps-badge" class="bg-v4red/20 text-v4red border border-v4red/30 px-2.5 py-1 rounded-full text-xs font-bold"></span>
+                    </div>
+                    
+                    <div id="timeline-container" class="flex-1 overflow-y-auto p-4 space-y-1">
+                        <!-- Itens renderizados via JS -->
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Detalhes -->
+                <div class="w-full md:w-2/3 lg:w-3/4 bg-cardbg border border-white/5 rounded-3xl backdrop-blur-md flex flex-col overflow-hidden shadow-2xl relative">
+                    
+                    <!-- Estado Inicial (Welcome) -->
+                    <div id="welcome-view" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-500 z-10">
+                        <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                            <i class="fa-solid fa-route text-4xl text-v4red opacity-80 animate-bounce"></i>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-sans font-bold mb-4 text-white">Bem-vindo ao Novo Fluxo</h2>
+                        <p class="text-gray-400 text-sm sm:text-base max-w-lg leading-relaxed">
+                            Simplificamos as tarefas para o executor. Selecione uma etapa no menu à esquerda para visualizar os detalhes, bloqueios e requisitos de cada fase da implementação do CRM.
+                        </p>
+                    </div>
+
+                    <!-- Card de Detalhes (Escondido inicialmente) -->
+                    <div id="detail-card" class="absolute inset-0 flex flex-col overflow-y-auto opacity-0 pointer-events-none transform scale-95 transition-all duration-500 z-20 bg-black/20">
+                        
+                        <!-- Cabeçalho do Card -->
+                        <div class="p-8 pb-6 border-b border-white/5 relative bg-gradient-to-b from-black/40 to-transparent">
+                            <div class="absolute top-0 right-0 bg-v4red text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider shadow-lg shadow-red-900/50">
+                                Passo <span id="card-step-number"></span> de <span id="total-steps-count"></span>
+                            </div>
+                            
+                            <div class="flex items-center gap-5 mt-2">
+                                <div id="card-icon-container" class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-v4red text-2xl shadow-inner">
+                                    <!-- Icon -->
+                                </div>
+                                <h2 id="card-title" class="text-2xl sm:text-3xl font-sans font-bold text-white">Título</h2>
+                            </div>
+                        </div>
+
+                        <!-- Corpo do Card -->
+                        <div class="p-8 flex-1">
+                            
+                            <!-- Box de Alerta (Blocagem) -->
+                            <div id="card-alert" class="hidden mb-8 bg-v4red/10 border-l-4 border-v4red p-5 rounded-r-xl shadow-md">
+                                <div class="flex items-start gap-4">
+                                    <i class="fa-solid fa-circle-exclamation text-v4red text-2xl mt-0.5"></i>
+                                    <div>
+                                        <h4 class="text-v4red font-bold text-sm uppercase mb-1 tracking-wide">Atenção Crítica (Blocker)</h4>
+                                        <p id="card-alert-text" class="text-gray-300 text-sm leading-relaxed"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Descrição -->
+                            <div class="mb-8">
+                                <h3 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-4 border-b border-white/10 pb-2">Instruções e Documentação da Tarefa</h3>
+                                <div id="card-desc" class="text-base text-gray-300 leading-relaxed font-light"></div>
+                            </div>
+
+                            <!-- Rodapé do Card (Infos Adicionais) -->
+                            <div class="bg-black/40 rounded-xl p-5 border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-white/5 text-gray-400 p-3 rounded-full border border-white/5">
+                                        <i class="fa-regular fa-calendar-check text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">Prazo de Execução</h4>
+                                        <p class="text-xs text-gray-500 mt-0.5">A ser definido e alinhado em contrato/kick-off</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white/5 border border-white/10 px-4 py-2 rounded-lg shadow-sm text-xs font-semibold text-v4red whitespace-nowrap">
+                                    Data: Acordada com Cliente
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ==========================================
+            // Lógica do Menu Mobile
+            // ==========================================
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+            function toggleSidebar() {
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.remove('hidden');
+                    setTimeout(() => sidebarOverlay.classList.add('opacity-100'), 10);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.remove('opacity-100');
+                    setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+                }
+            }
+
+            mobileMenuBtn?.addEventListener('click', toggleSidebar);
+            closeSidebarBtn?.addEventListener('click', toggleSidebar);
+            sidebarOverlay?.addEventListener('click', toggleSidebar);
+
+            // ==========================================
+            // DADOS DO POP (Mapeados para Dark Mode e FontAwesome)
+            // ==========================================
+            const processSteps = [
+                {
+                    id: 1,
+                    title: "Growth Class (Kick-off)",
+                    shortDesc: "Reunião inaugural de alinhamento.",
+                    fullDesc: `
+                        A <strong class="text-white font-medium">Growth Class</strong> é o marco zero da implementação. Momento essencial para recalibrar expectativas, alinhar o escopo e definir as responsabilidades do cliente.
+                        <div class="mt-5 p-5 bg-black/40 border border-white/10 rounded-xl">
+                            <h4 class="font-bold text-white mb-4 text-sm flex items-center gap-2 uppercase tracking-wide">
+                                <i class="fa-solid fa-list-check text-v4red"></i> Roteiro da Reunião (Pauta)
+                            </h4>
+                            <ul class="list-none space-y-3 text-sm text-gray-400">
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Apresentação & Fluxo:</strong> Apresentar o time do projeto, canais de comunicação e explicar as fases da implementação.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Balizamento de Escopo:</strong> Explicar claramente o que a implementação abrange e o que fica de fora (ex: CRM não fará as vendas pelo time).</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-circle-check text-green-500 mt-1"></i>
+                                    <span><strong class="text-gray-200">Responsabilidades do Cliente:</strong> Garantir que o cliente saiba que depende dele o preenchimento de formulários e aprovação de blueprints.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-person-chalkboard",
+                    isBlocker: true,
+                    alertText: "NÃO AVANÇAR SEM ESSA CALL. Apenas prossiga após o cliente assinar ou dar o 'de acordo' nas premissas alinhadas nesta etapa."
+                },
+                {
+                    id: 2,
+                    title: "Discovery Técnico",
+                    shortDesc: "Imersão no negócio do cliente.",
+                    fullDesc: "Realizar a <strong class='text-white'>Call de Discovery</strong> e aplicar formulários. O objetivo principal desta tarefa é coletar, ouvir e confirmar todas as informações estratégicas sobre o segmento, modelo de negócios, jornada atual do lead e requisitos técnicos do cliente.",
+                    icon: "fa-solid fa-phone-volume",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 3,
+                    title: "Planejamento de CRM",
+                    shortDesc: "Documento detalhado de funil e usuários.",
+                    fullDesc: "Montar um documento de planejamento (Blueprint) de CRM detalhado. Este documento deve obrigatoriamente conter:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Mapeamento das Etapas de Funil.</li><li>Definição e número de usuários que acessarão a plataforma.</li><li>Desenho de todas as automações necessárias.</li><li>Textos e Modelos de Mensagens Padrões.</li></ul>",
+                    icon: "fa-solid fa-pen-ruler",
+                    isBlocker: true,
+                    alertText: "ESSA TAREFA SÓ DEVERÁ SER CONCLUÍDA APÓS O CLIENTE APROVAR. Para dar início às próximas tarefas, precisamos deste documento aprovado e validado formalmente pelo cliente."
+                },
+                {
+                    id: 4,
+                    title: "Contratação da Plataforma",
+                    shortDesc: "Criar contas e assinar plano.",
+                    fullDesc: "Após o planejamento de CRM ser aprovado, realizar a criação da conta e a contratação da plataforma de CRM escolhida. Iniciar pelo menos no plano grátis de testes ou período de trial, garantindo acesso completo à equipe executora.",
+                    icon: "fa-solid fa-credit-card",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 5,
+                    title: "Configuração Unificada",
+                    shortDesc: "Implementar fluxos e automações.",
+                    fullDesc: "<strong class='text-white'>Tarefa Unificada:</strong> Aqui centralizamos a execução do que foi aprovado no Planejamento. O executor deve configurar de uma só vez no sistema escolhido:<br><br><ul class='list-disc pl-5 space-y-2 text-base text-gray-400'><li>Criação das etapas do Funil e Fluxos.</li><li>Criação de Campos Personalizados e Tags.</li><li>Configuração das Automações Padrões.</li><li>Setup dos Modelos de Mensagens Padrões (WhatsApp, Email, SMS).</li></ul><br><div class='mt-4 p-3 bg-white/5 border border-white/10 rounded text-sm text-gray-400'><i class='fa-solid fa-circle-info text-v4red mr-2'></i>Nota: Tudo deve ser configurado seguindo rigidamente o blueprint validado.</div>",
+                    icon: "fa-solid fa-sliders",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 6,
+                    title: "Testes e Validação",
+                    shortDesc: "Stress test de automações.",
+                    fullDesc: "Tarefa focada exclusivamente em Qualidade (QA). O executor deve testar e validar o CRM fazendo testes de estresse em todas as automações criadas, simulando a jornada real de um Lead (Mistery Shopper) por todas as etapas do funil de vendas, garantindo que gatilhos operem perfeitamente.",
+                    icon: "fa-solid fa-bug",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 7,
+                    title: "Treinamento",
+                    shortDesc: "Capacitação da equipe na plataforma.",
+                    fullDesc: "Realizar a call de treinamento de CRM com o cliente e sua equipe de vendas. Garantir que eles saibam na prática como: operar os cards do funil, preencher campos obrigatórios, adicionar notas, fazer leitura de tags e utilizar os atalhos de mensagens no dia a dia.",
+                    icon: "fa-solid fa-person-rays",
+                    isBlocker: false,
+                    alertText: ""
+                },
+                {
+                    id: 8,
+                    title: "Gate de NPS (Trava)",
+                    shortDesc: "Liberação após pesquisa.",
+                    fullDesc: `
+                        O <strong class="text-white font-medium">Gate de NPS</strong> atua como a barreira final de qualidade antes de liberarmos as chaves do carro para o cliente dirigir.
+                        <div class="mt-5 p-5 bg-black/40 border-l-4 border-v4red rounded-r-xl shadow-md">
+                            <h4 class="font-bold text-white mb-2 uppercase text-xs tracking-wider">Protocolo de Ativação (Go-Live)</h4>
+                            <p class="text-sm text-gray-400 mb-4">A ativação oficial das automações em ambiente de produção só deverá ocorrer <strong class="text-white">após</strong> o preenchimento da pesquisa de NPS pelo cliente avaliando a implementação.</p>
+                            <ol class="list-decimal pl-4 space-y-2 text-sm text-gray-300">
+                                <li>Disparo do Link/Formulário de NPS pós-treinamento.</li>
+                                <li>Monitoramento do preenchimento e leitura da nota/feedback.</li>
+                                <li>Desbloqueio: Ativação definitiva das campanhas e do fluxo de entrada.</li>
+                            </ol>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-lock",
+                    isBlocker: true,
+                    alertText: "OPERAÇÃO TRAVADA: As integrações finais (entrada de leads reais no sistema) SÓ PODEM SER ATIVADAS mediante a confirmação de recebimento da nota do NPS."
+                },
+                {
+                    id: 9,
+                    title: "Auditoria Mensal",
+                    shortDesc: "Manutenção pós Go-Live.",
+                    fullDesc: `
+                        Fase Contínua. Uma vez entregue, o ecossistema de CRM precisa de monitoramento ativo. Execute este checklist <strong class="text-white">1x por mês</strong>.
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> Saúde do Número</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Revisar Meta Business Suite: status de bloqueio, taxa de quality rating e status de templates.</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-plug text-blue-500 text-lg"></i> Conexões e APIs</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Checar os logs de integrações. Reconectar acessos nativos expirados (ex: Token FB).</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-robot text-purple-500 text-lg"></i> Automações Ativas</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Inserir 1 lead "espião" para garantir que gatilhos e disparos estão operando sem falhas.</p>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <h5 class="font-bold text-sm text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-broom text-v4red text-lg"></i> Higiene da Base</h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">Auditar excesso de leads atrasados, remover duplicados e garantir padronização de Tags.</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: "fa-solid fa-stethoscope",
+                    isBlocker: false,
+                    alertText: ""
+                }
+            ];
+
+            let currentActiveId = null;
+
+            // ==========================================
+            // Lógica de Renderização e Interação POP
+            // ==========================================
+            function initApp() {
+                document.getElementById('total-steps-badge').textContent = processSteps.length + ' Etapas';
+                document.getElementById('total-steps-count').textContent = processSteps.length;
+                renderTimeline();
+            }
+
+            function renderTimeline() {
+                const container = document.getElementById('timeline-container');
+                container.innerHTML = '';
+
+                processSteps.forEach((step, index) => {
+                    const isLast = index === processSteps.length - 1;
+                    
+                    const stepEl = document.createElement('div');
+                    stepEl.id = `step-container-${step.id}`;
+                    stepEl.className = 'relative flex gap-4 p-3 rounded-xl cursor-pointer group step-transition border border-transparent hover:bg-white/5 hover:border-white/10';
+                    stepEl.onclick = () => selectStep(step.id);
+
+                    const lineHtml = !isLast ? `<div class="absolute left-[2.15rem] top-12 bottom-[-16px] w-0.5 bg-white/5 group-hover:bg-white/10 transition-colors z-0"></div>` : '';
+
+                    stepEl.innerHTML = `
+                        ${lineHtml}
+                        <div id="bubble-${step.id}" class="w-11 h-11 rounded-xl border border-white/10 bg-black/50 flex items-center justify-center flex-shrink-0 z-10 transition-all duration-300 text-gray-500 group-hover:text-white group-hover:border-v4red/50 shadow-sm">
+                            <i class="${step.icon} text-lg"></i>
+                        </div>
+                        
+                        <div class="pb-2 pt-1 flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 id="title-${step.id}" class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">
+                                    ${step.id}. ${step.title}
+                                </h3>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 line-clamp-1">${step.shortDesc}</p>
+                            ${step.isBlocker ? '<span class="inline-block mt-2 text-[10px] bg-v4red/20 border border-v4red/30 text-v4red px-2 py-0.5 rounded font-bold uppercase tracking-wider">Blocker</span>' : ''}
+                        </div>
+                    `;
+                    container.appendChild(stepEl);
+                });
+            }
+
+            // Expor função globalmente para os onclicks
+            window.selectStep = function(id) {
+                const step = processSteps.find(s => s.id === id);
+                if (!step) return;
+
+                // 1. Resetar estados anteriores
+                if (currentActiveId) {
+                    const prevContainer = document.getElementById(`step-container-${currentActiveId}`);
+                    const prevBubble = document.getElementById(`bubble-${currentActiveId}`);
+                    const prevTitle = document.getElementById(`title-${currentActiveId}`);
+                    
+                    if(prevContainer) {
+                        prevContainer.classList.remove('bg-white/5', 'border-white/10');
+                        prevContainer.classList.add('border-transparent');
+                    }
+                    if (prevBubble) {
+                        prevBubble.classList.remove('bg-v4red', 'border-v4red', 'text-white', 'shadow-[0_0_15px_rgba(220,38,38,0.4)]');
+                        prevBubble.classList.add('bg-black/50', 'border-white/10', 'text-gray-500');
+                    }
+                    if (prevTitle) {
+                        prevTitle.classList.remove('text-white');
+                        prevTitle.classList.add('text-gray-300');
+                    }
+                }
+
+                // 2. Setar novo estado ativo
+                const activeContainer = document.getElementById(`step-container-${id}`);
+                const activeBubble = document.getElementById(`bubble-${id}`);
+                const activeTitle = document.getElementById(`title-${id}`);
+                
+                if(activeContainer) {
+                    activeContainer.classList.remove('border-transparent');
+                    activeContainer.classList.add('bg-white/5', 'border-white/10');
+                }
+                if (activeBubble) {
+                    activeBubble.classList.remove('bg-black/50', 'border-white/10', 'text-gray-500');
+                    activeBubble.classList.add('bg-v4red', 'border-v4red', 'text-white', 'shadow-[0_0_15px_rgba(220,38,38,0.4)]');
+                }
+                if (activeTitle) {
+                    activeTitle.classList.remove('text-gray-300');
+                    activeTitle.classList.add('text-white');
+                }
+
+                currentActiveId = id;
+
+                // 3. Atualizar o Card de Detalhes
+                const welcomeView = document.getElementById('welcome-view');
+                const card = document.getElementById('detail-card');
+                
+                welcomeView.classList.add('opacity-0');
+                setTimeout(() => welcomeView.classList.add('pointer-events-none'), 300);
+                
+                // Animação de entrada do card
+                card.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+                card.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+
+                setTimeout(() => {
+                    document.getElementById('card-step-number').textContent = step.id;
+                    document.getElementById('card-title').textContent = step.title;
+                    document.getElementById('card-icon-container').innerHTML = `<i class="${step.icon}"></i>`;
+                    document.getElementById('card-desc').innerHTML = step.fullDesc;
+
+                    const alertBox = document.getElementById('card-alert');
+                    if (step.isBlocker) {
+                        document.getElementById('card-alert-text').textContent = step.alertText;
+                        alertBox.classList.remove('hidden');
+                    } else {
+                        alertBox.classList.add('hidden');
+                    }
+
+                    // Trigger reflow
+                    void card.offsetWidth;
+                    card.classList.remove('scale-95', 'opacity-0', 'pointer-events-none');
+                    card.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+                }, 200);
+            }
+
+            initApp();
+        });
+    </script>
+</body>
+</html>
