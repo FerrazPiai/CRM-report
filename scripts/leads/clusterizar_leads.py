@@ -35,17 +35,30 @@ import pandas as pd
 # --------------------------------------------------------------------------------------
 
 DDD_PADRAO = "11"  # operação em São Paulo: telefone sem DDD recebe 11
+# Dois núcleos de venda: acima de 100 peças vai para a fábrica, até 100 vai para a loja
+# (mesmas faixas do formulário do site: "100 peças ou menos" / "Mais de 101 peças").
+LIMITE_FABRICA = 100
+# Quantidade de abas individuais para as maiores contas (por nº de contatos aptos)
+QTD_ABAS_CONTAS = 20
 
 # Qualquer domínio com "camisetaexpress" (inclui erros de digitação, Odoo e disparos Locaweb)
 RE_DOMINIO_INTERNO = re.compile(r"camisetas?exp")
 RE_EMAIL_SISTEMA = re.compile(r"^(no-?reply|notifications?|mailer-daemon|postmaster|donotreply|bounce)")
+
+
+def eh_sistema(email):
+    dom = email.split("@")[-1]
+    return bool(RE_EMAIL_SISTEMA.match(email)) or any(d in dom for d in DOMINIOS_SISTEMA)
 # Endereços que aparecem em cópia em praticamente todos os e-mails internos e
 # contatos de teste do site. Revisar se algum deles for de fato cliente.
-EMAILS_INTERNOS = {
-    "thiagosilva.webdev@gmail.com",
-    "sr.garcia2015.sg@gmail.com",
-    "priscila.stamp2@gmail.com",
-}
+EMAILS_INTERNOS = {"thiagosilva.webdev@gmail.com"}
+# Aparecem em cópia em quase todos os e-mails internos; tratados como equipe até a cliente confirmar
+EMAILS_INTERNOS_A_CONFIRMAR = {"sr.garcia2015.sg@gmail.com", "priscila.stamp2@gmail.com"}
+# Nome do contato indicando alguém da equipe (ex.: "Aline Batista - Camiseta Express")
+RE_NOME_EQUIPE = re.compile(r"camisetas? ?express|\bcamex\b", re.I)
+# Remetentes automáticos (plataformas de e-mail, assinatura etc.)
+DOMINIOS_SISTEMA = ("mcsv.net", "docusign.net", "sendgrid.net", "amazonses.com", "mailchimp.com",
+                    "rdstation.com.br", "hubspot.com", "odoo.com", "locaweb.com.br", "emktlw")
 TELEFONES_INTERNOS = {"+5511952532669"}
 
 # Datas em que cada planilha "sem data por linha" entrou na pasta (nome do arquivo
@@ -69,6 +82,7 @@ PROVEDORES_PESSOAIS = {
     "globo.com", "globomail.com", "r7.com", "zipmail.com.br", "oi.com.br", "protonmail.com",
     "proton.me", "aol.com", "gmx.com", "yandex.com", "mail.com", "superig.com.br", "pop.com.br",
     "click21.com.br", "itelefonica.com.br", "veloxmail.com.br", "brturbo.com.br", "ibest.com.br",
+    "yahoo.fr", "yahoo.es", "yahoo.co.uk", "hotmail.fr", "hotmail.es", "live.fr", "outlook.pt", "sapo.pt",
 }
 CORRECOES_DOMINIO = {
     "gmail.con": "gmail.com", "gmail.co": "gmail.com", "gmial.com": "gmail.com", "gmai.com": "gmail.com",
@@ -77,6 +91,8 @@ CORRECOES_DOMINIO = {
     "hotmai.com": "hotmail.com", "hotmil.com": "hotmail.com", "outlook.con": "outlook.com",
     "yahoo.con": "yahoo.com", "yahoo.com.b": "yahoo.com.br", "uol.com": "uol.com.br",
     "hormail.com": "hotmail.com", "hotmail.co": "hotmail.com", "outlok.com": "outlook.com",
+    "gmail.xom": "gmail.com", "gmail.cm": "gmail.com", "gmail.om": "gmail.com", "gmail.comm": "gmail.com",
+    "hotmail.cm": "hotmail.com", "hotmail.om": "hotmail.com",
 }
 # Domínios de robôs/spam vistos nos formulários e listas
 DOMINIOS_SPAM = {"course-fitness.com", "inrus.top"}
@@ -109,6 +125,9 @@ ALIAS_EMPRESAS = {
     "bcgbrasil": "BCG Brasil", "amazon": "Amazon", "shopee": "Shopee", "google": "Google",
     "roldao": "Roldão Atacadista", "extrafarma": "Extrafarma", "tirolez": "Tirolez",
 }
+# Preenchidos por --equipe (lista de e-mails/telefones da equipe enviada pela cliente)
+EQUIPE_EMAILS, EQUIPE_TELEFONES = set(), set()
+
 # Palavras que parecem empresa no nome do contato, mas são bairro/genéricas
 NAO_E_EMPRESA_EM_NOME = {"digital", "prefeitura", "alphaville", "palmeiras", "brasil", "grupo", "eventos",
                          "comercial", "escola", "colegio", "igreja", "academia", "studio", "design"}
@@ -121,6 +140,87 @@ MARCAS_EM_NOME = {
     "pepsico": "pepsico", "cocacola": "cocacola", "bayer": "bayer", "raizen": "raizen",
     "petrobras": "petrobras", "magalu": "magalu", "renner": "renner", "riachuelo": "riachuelo",
     "sodexo": "sodexo", "ifood": "ifood", "nubank": "nubank", "votorantim": "votorantim",
+}
+
+# Setor por empresa (raiz do domínio ou nome sem espaços). Usado para réguas por segmento.
+S_SUPER = "Supermercados & Atacarejo"
+S_ALIM = "Indústria de Alimentos & Bebidas"
+S_CONSUMO = "Indústria & Bens de Consumo"
+S_FIN = "Financeiro & Seguros"
+S_SAUDE = "Saúde & Farma"
+S_EDU = "Educação"
+S_VAREJO = "Varejo & E-commerce"
+S_TEC = "Tecnologia & Telecom"
+S_MIDIA = "Mídia & Editoras"
+S_AGENCIA = "Agências, Marketing & Eventos"
+S_BRINDES = "Promocional & Brindes"
+S_GRAFICA = "Gráficas & Impressão"
+S_SERV = "Serviços Profissionais & Facilities"
+S_LOG = "Logística, Transporte & Turismo"
+S_CONSTR = "Construção & Imobiliário"
+S_PUBLICO = "Setor Público, Associações & Esporte"
+S_ATAC = "Atacadistas & Distribuição"
+S_BUFFET = "Buffets & Festas"
+S_CONDO = "Condomínios"
+S_FRANQ = "Franquias"
+S_NAO = "Não classificado"
+_SETORES_MANUAIS = {
+    S_SUPER: "carrefour atacadao assai gpabr multivarejogpa roldao makro wal-mart walmart davo institutogpa "
+             "abras sonda paodeacucar dia savegnago mambo",
+    S_ALIM: "heineken nestle vigor mdiasbranco grupobimbo ambev tirolez bauducco barry-callebaut panco kof "
+            "redbull cacaushow leaoalimentosebebidas garoto 3coracoes moinhosantaclara flavors castrolanda "
+            "danone pepsico cocacola unilever-foods mondelez seara brf jbs marfrig",
+    S_CONSUMO: "kcc whirlpool multibras basf alpargatas colpal unilever samsung gerdau dow avon natura "
+               "grupoboticario sealedair jnj saint-gobain modine lge bosch luxottica bimcosmeticos bignardi "
+               "fremplast isapa leomadeiras marangoni apple bayer votorantim heinz",
+    S_FIN: "safra itau itau-unibanco unibanco redecard santander cashme sulamerica experian caixa bradesco "
+           "pine bb citi edenred elopar btgpactual xp nubank stone pagar cielo porto ca-cib",
+    S_SAUDE: "hnipo thermofisher biolabfarma hcor eurofarma amil hipersaude extrafarma einstein fleury "
+             "dasa unimed raiadrogasil",
+    S_EDU: "usp fgv senai senac metodista wizard cna yazigi espm unesp pearson colegiodelta huji cicloacademy "
+           "educacao unicamp unifesp mackenzie puc insper anhembi",
+    S_VAREJO: "amazon viavarejo magazineluiza magalu pernambucanas shopee enjoei gimba iguatemi renner "
+              "riachuelo cea",
+    S_TEC: "google claro netservicos qintess omie numenit pluginbot ituran aegro webmotors microsoft "
+           "totvs ifood vivo tim oracle ibm",
+    S_MIDIA: "edglobo oglobo infoglobo grupoestado informa rxglobal reedalcantara itmidia midiaview disney "
+             "globo",
+    S_AGENCIA: "tm1 reddoor elkis18 agenciaea mci-group llacuna agenciaflagship link-worldwide l-founders "
+               "squadrabrasil agenciayall valiant 4allcom camarim9 sherpa42 creata expertisegroup "
+               "brixcomunicacao arteeatitude agenciaoriba scoregroup itmkt voeideias nucleocenografia "
+               "grupommeventos cantacom audicomunicacao arcww agencia7etti cogra celebrar spotpromo "
+               "promomark grupovb sintonia eventosmg fanclubbrasil hy-in cadaris convergenciacom",
+    S_BRINDES: "brindice unitybrindes promoaction buybest",
+    S_SERV: "gpssa hagana pierserv jll revisora aclcontabilidade deloitte renase kpmg pwc ey accenture",
+    S_LOG: "voeazul jadlog correios jsl mundiallogistics marshipping flytour zenatur rcaturismo latam gol",
+    S_CONSTR: "eztec lavvi alphaville cyrela mrv",
+    S_PUBLICO: "metrosp prefeitura tjsp fecomercio apmp acij volei palmeiras aatb cataventocultural "
+               "cidadaopromundo projetogauss sebrae sesc",
+}
+SETOR_POR_EMPRESA = {k: setor for setor, ks in _SETORES_MANUAIS.items() for k in ks.split()}
+# Palavras no nome da empresa/domínio -> setor (usado quando a empresa não está na lista acima)
+SETOR_POR_PALAVRA = [
+    (S_SUPER, r"supermerc|hipermerc|atacarej|\bmercado"),
+    (S_FIN, r"banco|bank|invest|capital|segur|financ|credito|consorcio|pagamento|\bpay"),
+    (S_EDU, r"escola|colegio|educa|universidade|faculdade|ensino|idioma|english|ingles|academy|curso|\bedu\b"),
+    (S_SAUDE, r"hospital|saude|clinica|farma|medic|odonto|laborat|drogaria"),
+    (S_BRINDES, r"brinde"),
+    (S_GRAFICA, r"grafica|impress|\bprint|sinaliz|comunicacao visual"),
+    (S_AGENCIA, r"agencia|comunica|propaganda|publicidade|marketing|\bmkt|promo|evento|produco|produca|"
+                r"cenografia|\bmidia|design|studio|estudio"),
+    (S_ALIM, r"aliment|foods?\b|bebida|laticin|\bcafe|chocolate|padaria|cervej"),
+    (S_TEC, r"tech|software|sistema|tecnologia|informatica|digital|cloud|\bdata|telecom|\bti\b"),
+    (S_CONSTR, r"construt|engenharia|imobil|incorpora|arquitet"),
+    (S_LOG, r"transport|logistic|cargo|\blog\b|turismo|viage|\btour"),
+    (S_PUBLICO, r"prefeitura|tribunal|secretaria|governo|camara|associa|instituto|fundacao|sindicato|"
+                r"\bong\b|clube|federacao|confedera|\bgov\b|igreja"),
+    (S_SERV, r"advoga|contab|consultor|auditor|juridic|seguranca|limpeza|facilities"),
+]
+# Listas da Locaweb -> setor
+SETOR_POR_LISTA = {
+    "agencias_de_mkt_e_publicidade": S_AGENCIA, "abap": S_AGENCIA, "brasil_promotions": S_BRINDES,
+    "impressao_digital": S_GRAFICA, "atacadistas": S_ATAC, "empresas_alimenticias": S_ALIM,
+    "buffet_infantil": S_BUFFET, "condominios": S_CONDO, "escola_de_ingles": S_EDU, "franquias": S_FRANQ,
 }
 
 # Listas da Locaweb -> (vertical, carteira, núcleo sugerido)
@@ -317,7 +417,8 @@ def raiz_dominio(dom):
 def empresa_valida(txt):
     t = decodificar_escapes(txt or "").strip()
     k = chave_texto(t)
-    if k in LIXO_EMPRESA or len(k) < 2 or re.fullmatch(r"[\d\s./-]+", t):
+    if k in LIXO_EMPRESA or len(k) < 2 or re.fullmatch(r"[\d\s./-]+", t) \
+            or re.match(r"(nao|sem) (tenho|possuo|tem|empresa)|nenhum|pessoa fisica|particular|para (mim|uso)", k):
         return ""
     if re.search(r"\d{3}\.\d{3}\.\d{3}-\d{2}", t) or "@" in t or "http" in t.lower():
         return ""
@@ -341,26 +442,35 @@ def parse_data(v):
 
 
 def estimar_volume(*textos):
-    melhor = None
+    """Retorna (quantidade, faixa). Faixa segue a regra da cliente, alinhada às opções do
+    formulário do site: até 100 peças -> "loja"; acima de 100 peças -> "fabrica"."""
+    melhor, faixas = None, set()
     for t in textos:
         t = decodificar_escapes(t or "")
         if not t:
             continue
         if re.search(r"mais de 10[01]", t, re.I):
             melhor = max(melhor or 0, 101)
+            faixas.add("fabrica")
         elif re.search(r"100 pe[çc]as ou menos", t, re.I):
-            melhor = max(melhor or 0, 100)
+            faixas.add("loja")  # faixa "até 100", sem quantidade exata
         elif re.search(r"20 pe[çc]as ou menos", t, re.I):
             melhor = max(melhor or 0, 20)
+            faixas.add("loja")
         elif re.search(r"21 [àa] 50", t, re.I):
             melhor = max(melhor or 0, 50)
+            faixas.add("loja")
+        # remove o texto das opções do formulário para não contá-lo de novo como quantidade
+        t = re.sub(r"\d+ pe[çc]as ou menos|mais de 10[01](?: pe[çc]as)?|21 [àa] 50", " ", t, flags=re.I)
         for m in RE_QTD.finditer(t):
             n = int(re.sub(r"\D", "", m.group(1)))
             if "mil" in m.group(0).lower():
                 n *= 1000
             if 1 <= n <= 200000:
                 melhor = max(melhor or 0, n)
-    return melhor
+                faixas.add("fabrica" if n > LIMITE_FABRICA else "loja")
+    faixa = "fabrica" if "fabrica" in faixas else "loja" if faixas else None
+    return melhor, faixa
 
 
 # --------------------------------------------------------------------------------------
@@ -474,7 +584,7 @@ def extrair_registros(pasta):
                     solicitacao=not any(x in form.lower() for x in FORMS_SEM_INTENCAO),
                     interesse=interesse or (pagina if pagina not in ("Home", "Contato", "Sobre nós") else ""),
                     assunto=assunto, mensagem=msg[:500], spam=spam,
-                    volume=estimar_volume(r[c_qtd] if c_qtd else "", msg),
+                    **dict(zip(("volume", "faixa"), estimar_volume(r[c_qtd] if c_qtd else "", msg))),
                 ))
 
         # 2) Listas de e-mail marketing Locaweb
@@ -531,8 +641,12 @@ def extrair_registros(pasta):
                 continue
             if stem.startswith("contatos"):
                 dono = re.sub(r"\d.*$", "", p.stem[8:]).strip("_- ") or "Agenda"
-                dono = {"Debora": "Débora", "Camex": "WhatsApp Camex"}.get(dono, dono)
-                fonte, detalhe, carteira = "Agendas WhatsApp/Outlook", f"Agenda {dono}", dono
+                dono = {"Debora": "Débora", "Camex": "Rose (WhatsApp)"}.get(dono, dono)
+                detalhe = f"Agenda {dono}"
+                if dono.startswith("Rose"):
+                    # celular da Rose, vinculado à conta da loja: tem clientes da loja misturados
+                    detalhe = "Agenda WhatsApp Rose (conta vinculada à loja)"
+                fonte, carteira = "Agendas WhatsApp/Outlook", dono
             elif "chat" in stem:
                 fonte, detalhe, carteira = "Site - Chat", "Leads chat do site", None
             elif "atualiza" in stem:
@@ -593,10 +707,19 @@ def consolidar(registros, interacoes, dono_interacao, ref):
         r["nome_l"] = limpar_nome(r.get("nome"))
         r["empresa_l"] = empresa_valida(r.get("empresa"))
         e = r["email_n"] or ""
-        r["interno"] = (bool(RE_DOMINIO_INTERNO.search(e.split("@")[-1])) or bool(RE_EMAIL_SISTEMA.match(e))
-                        or e in EMAILS_INTERNOS
-                        or any(t[0] in TELEFONES_INTERNOS for t in tels)
-                        or chave_texto(r["nome_l"]) in ("teste", "test", "thiago teste"))
+        # motivo interno ("" = é lead)
+        if e and (RE_DOMINIO_INTERNO.search(e.split("@")[-1]) or e in EMAILS_INTERNOS or e in EQUIPE_EMAILS) \
+                or any(t[0] in TELEFONES_INTERNOS or t[0] in EQUIPE_TELEFONES for t in tels) \
+                or RE_NOME_EQUIPE.search(r.get("nome") or ""):
+            r["interno"] = "Equipe Camiseta Express"
+        elif e and e in EMAILS_INTERNOS_A_CONFIRMAR:
+            r["interno"] = "Equipe (a confirmar com a cliente)"
+        elif e and eh_sistema(e):
+            r["interno"] = "Endereço automático / sistema"
+        elif chave_texto(r["nome_l"]) in ("teste", "test", "thiago teste"):
+            r["interno"] = "Teste"
+        else:
+            r["interno"] = ""
 
     # telefones compartilhados por muitos e-mails diferentes não servem de chave de ligação
     emails_por_tel = collections.defaultdict(set)
@@ -686,22 +809,25 @@ def montar_contato(rs, interacoes, dono_interacao, ref, nome_empresa, vocab):
         nome_origem = "derivado do e-mail" if nome else ""
 
     # Empresa: formulário > domínio corporativo > marca citada no nome do contato
-    empresa, empresa_origem, dominio = "", "", ""
+    empresa, empresa_origem, dominio, empresa_chave = "", "", "", ""
     emp_forms = [r["empresa_l"] for r in rs if r["empresa_l"]]
     if corp:
         dominio = corp[0].split("@")[1]
         if raiz_dominio(dominio) in DOMINIOS_GENERICOS and emp_forms:
             empresa, empresa_origem = emp_forms[-1], "informada no formulário"
         else:
-            empresa, empresa_origem = nome_empresa(raiz_dominio(dominio)), "domínio do e-mail"
+            empresa_chave = raiz_dominio(dominio)
+            empresa, empresa_origem = nome_empresa(empresa_chave), "domínio do e-mail"
     if emp_forms and not empresa:
         empresa, empresa_origem = emp_forms[-1], "informada no formulário"
     if not empresa:
         tokens = set(chave_texto(" ".join(r.get("nome") or "" for r in rs)).split())
         achadas = [vocab[t] for t in tokens if t in vocab]
         if achadas:
-            empresa, empresa_origem = nome_empresa(achadas[0]), "citada no nome do contato"
-            dominio = dominio or ""
+            empresa_chave = achadas[0]
+            empresa, empresa_origem = nome_empresa(empresa_chave), "citada no nome do contato"
+    if empresa and not empresa_chave:
+        empresa_chave = chave_texto(empresa).replace(" ", "")
 
     fontes = sorted({r["fonte"] for r in rs})
     detalhes = sorted({r["detalhe"] for r in rs if r.get("detalhe")})
@@ -734,8 +860,22 @@ def montar_contato(rs, interacoes, dono_interacao, ref, nome_empresa, vocab):
             interesses.append(v)
     msgs = [r["mensagem"] for r in reversed(solic) if r.get("mensagem")]
     volume = max((r.get("volume") or 0 for r in rs), default=0) or None
+    faixas = {r.get("faixa") for r in rs} - {None}
+    faixa = "fabrica" if "fabrica" in faixas else "loja" if faixas else None
     cidade = next((r["cidade"] for r in rs if r.get("cidade")), "")
-    interno = any(r["interno"] for r in rs)
+    interno = next((r["interno"] for r in rs if r["interno"]), "")
+
+    # Setor: lista manual por empresa > lista setorial da Locaweb > palavras no nome/domínio
+    setor, setor_origem = "", ""
+    if empresa_chave in SETOR_POR_EMPRESA:
+        setor, setor_origem = SETOR_POR_EMPRESA[empresa_chave], "empresa classificada"
+    elif any(l in SETOR_POR_LISTA for l in listas):
+        setor = next(SETOR_POR_LISTA[l] for l in listas if l in SETOR_POR_LISTA)
+        setor_origem = "lista setorial Locaweb"
+    elif empresa:
+        txt = chave_texto(f"{empresa} {dominio.replace('.', ' ')}")
+        setor = next((st for st, rx in SETOR_POR_PALAVRA if re.search(rx, txt)), S_NAO)
+        setor_origem = "palavra no nome/domínio" if setor != S_NAO else ""
     n_spam = sum(bool(r.get("spam")) for r in rs)
     spam = n_spam > 0 and n_spam >= len(rs) / 2 and not solic
 
@@ -744,6 +884,7 @@ def montar_contato(rs, interacoes, dono_interacao, ref, nome_empresa, vocab):
 
     return dict(
         nome=nome, empresa=empresa, empresa_origem=empresa_origem, dominio=dominio,
+        empresa_chave=empresa_chave, setor=setor, setor_origem=setor_origem, faixa_volume=faixa,
         email=email_principal, emails_adicionais="; ".join(e for e in emails if e != email_principal),
         tipo_email=("corporativo" if corp else "pessoal") if emails else "",
         telefone=formatar_telefone(tel_principal[0]) if tel_principal else "",
@@ -774,10 +915,14 @@ def montar_contato(rs, interacoes, dono_interacao, ref, nome_empresa, vocab):
 # Clusterização
 # --------------------------------------------------------------------------------------
 
+NUC_FABRICA = "Fábrica"
+NUC_LOJA = "Loja"
+NUC_QUALIF = "A qualificar"
+
 PAG_CONTAS = "Contas-Chave"
-PAG_B2B = "B2B Corporativo"
+PAG_B2B = "Fábrica - Corporativo"
 PAG_CANAL = "Agências-Brindes-Gráficas"
-PAG_LOJA = "Loja Física - Varejo"
+PAG_LOJA = "Loja - Varejo"
 PAG_ESCOLAR = "Uniforme Escolar"
 PAG_QUALIF = "A Qualificar"
 PAG_SUPR = "Supressão"
@@ -805,27 +950,45 @@ def clusterizar(df, ref):
     df["porte_conta"] = df["empresa"].map(porte)
     df["contatos_na_empresa"] = df["empresa"].map(lambda e: int(ag.loc[e].contatos) if e in ag.index else 0)
 
-    # --- Núcleo (B2B x Loja física) e segmento
-    def nucleo_segmento(r):
+    # --- Segmento (tipo de cliente) e núcleo de venda (Fábrica x Loja)
+    def segmento(r):
         orig = r["origens"].lower()
         if "uniforme escolar" in orig:
-            return "B2B", "Uniforme Escolar (revenda/kits)"
+            return "Uniforme Escolar (revenda/kits)"
         if "canal" in r["_nucleos_lista"]:
-            return "B2B", "Canal indireto: " + (r["vertical"] or "Agências/Brindes")
+            return "Canal indireto: " + (r["vertical"] or "Agências/Brindes")
         if "b2b" in r["_nucleos_lista"]:
-            return "B2B", r["vertical"]
+            return r["vertical"]
         if r["empresa"]:
-            return "B2B", "Empresa final"
-        if (r["volume_estimado"] or 0) >= 100:
-            return "B2B", "Empresa final (volume ≥100)"
+            return "Empresa final"
+        if r["faixa_volume"] == "fabrica":
+            return "Empresa final (pedido acima de 100 peças)"
         if "loja" in r["_nucleos_lista"] or (r["tipo_email"] == "pessoal" and r["qtd_solicitacoes"] > 0) \
-                or "copa brasil" in orig or "sustentabilidade" in orig:
-            return "Loja Física", "Varejo / projetos menores"
-        if r["tipo_email"] == "pessoal" and "Site" in r["fontes"]:
-            return "Loja Física", "Varejo / projetos menores"
-        return "A qualificar", "Sem indicação de empresa"
-    ns = df.apply(nucleo_segmento, axis=1, result_type="expand")
-    df["nucleo"], df["segmento"] = ns[0], ns[1]
+                or "copa brasil" in orig or "sustentabilidade" in orig \
+                or (r["tipo_email"] == "pessoal" and "Site" in r["fontes"]) or r["faixa_volume"] == "loja":
+            return "Pessoa física / projetos menores"
+        return "Sem indicação de empresa"
+    df["segmento"] = df.apply(segmento, axis=1)
+
+    def nucleo(r):
+        # 1º a quantidade informada decide sozinha (regra da cliente: acima de 100 = fábrica)
+        if r["faixa_volume"] == "fabrica":
+            return NUC_FABRICA, f"Quantidade informada acima de {LIMITE_FABRICA} peças"
+        if r["faixa_volume"] == "loja":
+            return NUC_LOJA, f"Quantidade informada de até {LIMITE_FABRICA} peças"
+        # 2º sem quantidade: perfil do contato
+        seg = r["segmento"]
+        if seg.startswith("Uniforme Escolar"):
+            return NUC_FABRICA, "Sem quantidade: revenda de uniforme escolar"
+        if seg.startswith("Canal indireto") or "b2b" in r["_nucleos_lista"]:
+            return NUC_FABRICA, "Sem quantidade: lista setorial B2B"
+        if r["empresa"]:
+            return NUC_FABRICA, "Sem quantidade: empresa identificada"
+        if seg.startswith("Pessoa física"):
+            return NUC_LOJA, "Sem quantidade: pessoa física / lista da loja"
+        return NUC_QUALIF, "Sem quantidade nem empresa"
+    ns = df.apply(nucleo, axis=1, result_type="expand")
+    df["nucleo"], df["criterio_nucleo"] = ns[0], ns[1]
 
     # --- Temperatura (data de entrada + indicadores de interação e propostas)
     def temperatura(r):
@@ -848,7 +1011,7 @@ def clusterizar(df, ref):
         if r["temperatura"] != TEMP_SUPR:
             return ""
         if r["interno"]:
-            return "Interno / teste / sistema"
+            return r["interno"]
         if r["spam"]:
             return "Spam de formulário"
         if r["optout"]:
@@ -871,8 +1034,7 @@ def clusterizar(df, ref):
         s += 8 if (r["locaweb_cliques"] or 0) > 0 else 3 if (r["locaweb_aberturas"] or 0) > 0 else 0
         s += 7 if r["tipo_email"] == "corporativo" else 0
         s += {"Conta-Chave": 10, "Conta Média": 5}.get(r["porte_conta"], 0)
-        v = r["volume_estimado"] or 0
-        s += 5 if v >= 100 else 2 if v >= 30 else 0
+        s += 5 if r["faixa_volume"] == "fabrica" else 0
         s += 3 if r["whatsapp_ok"] else 0
         s -= 5 if r["email_bounce"] and not r["whatsapp_ok"] else 0
         return max(0, min(100, s))
@@ -895,9 +1057,9 @@ def clusterizar(df, ref):
             return PAG_ESCOLAR
         if r["segmento"].startswith("Canal indireto"):
             return PAG_CANAL
-        if r["nucleo"] == "B2B":
+        if r["nucleo"] == NUC_FABRICA:
             return PAG_B2B
-        if r["nucleo"] == "Loja Física":
+        if r["nucleo"] == NUC_LOJA:
             return PAG_LOJA
         return PAG_QUALIF
     df["pagina"] = df.apply(pagina, axis=1)
@@ -908,6 +1070,12 @@ def clusterizar(df, ref):
     def tags(r):
         t = [f"nucleo:{slug(r['nucleo'])}", f"temp:{slug(r['temperatura'][3:].split('(')[0])}",
              f"pagina:{slug(r['pagina'])}"]
+        if r["empresa"]:
+            t.append(f"empresa:{slug(r['empresa'])}")
+        if r["setor"]:
+            t.append(f"setor:{slug(r['setor'])}")
+        if r["faixa_volume"]:
+            t.append("volume:acima_100" if r["faixa_volume"] == "fabrica" else "volume:ate_100")
         if r["vertical"]:
             t += [f"vertical:{slug(v)}" for v in r["vertical"].split("; ")]
         if r["porte_conta"]:
@@ -945,34 +1113,47 @@ def clusterizar(df, ref):
 # --------------------------------------------------------------------------------------
 
 COLUNAS = [
-    ("id_contato", "ID", 10), ("nome", "Nome", 26), ("empresa", "Empresa", 24), ("porte_conta", "Porte da conta", 13),
-    ("nucleo", "Núcleo", 12), ("segmento", "Segmento", 26), ("temperatura", "Temperatura", 24),
+    ("id_contato", "ID", 10), ("nome", "Nome", 26), ("empresa", "Empresa", 24), ("setor", "Setor", 24),
+    ("porte_conta", "Porte da conta", 13), ("nucleo", "Núcleo", 11), ("criterio_nucleo", "Critério do núcleo", 26),
+    ("segmento", "Segmento", 26), ("temperatura", "Temperatura", 24),
     ("score_prioridade", "Score", 7), ("email", "E-mail", 32), ("telefone", "Telefone", 16),
     ("whatsapp", "WhatsApp (disparo)", 15), ("uf", "UF", 5), ("coorte_entrada", "Coorte entrada", 10),
     ("data_entrada", "Data de entrada", 12), ("data_entrada_tipo", "Tipo da data", 14),
     ("ultima_solicitacao", "Última solicitação", 12), ("qtd_solicitacoes", "Nº solicitações", 9),
     ("interacoes_outlook", "E-mails trocados (Outlook)", 10), ("locaweb_status", "Status Locaweb", 14),
     ("locaweb_aberturas", "Aberturas", 8), ("locaweb_cliques", "Cliques", 7),
-    ("interesses", "Interesses", 24), ("volume_estimado", "Volume estimado (peças)", 10),
+    ("interesses", "Interesses", 24), ("faixa_volume", "Faixa de volume", 14),
+    ("volume_estimado", "Volume estimado (peças)", 10),
     ("carteira_vendedora", "Carteira", 14), ("vertical", "Vertical", 22), ("fontes", "Fontes", 30),
     ("origens", "Origens (arquivo/formulário/lista)", 36), ("tags", "Tags", 60),
     ("tipo_email", "Tipo e-mail", 11), ("emails_adicionais", "Outros e-mails", 26),
     ("telefones_adicionais", "Outros telefones", 20), ("tipo_telefone", "Tipo tel.", 9),
     ("ddd_assumido_11", "DDD 11 assumido", 8), ("dominio", "Domínio", 20),
-    ("empresa_origem", "Origem da empresa", 18), ("cidade", "Cidade", 12),
+    ("empresa_origem", "Origem da empresa", 18), ("setor_origem", "Origem do setor", 18), ("cidade", "Cidade", 12),
     ("ultima_mensagem", "Última mensagem", 40), ("motivo_supressao", "Motivo supressão", 20),
     ("qtd_fontes", "Nº fontes", 7), ("qtd_registros_brutos", "Nº registros unidos", 8),
 ]
 ORDEM_PAGINAS = [PAG_CONTAS, PAG_B2B, PAG_CANAL, PAG_ESCOLAR, PAG_LOJA, PAG_QUALIF, PAG_SUPR]
 DESC_PAGINAS = {
-    PAG_CONTAS: "Contatos de empresas com 5+ contatos na base, 20+ e-mails trocados ou marcas estratégicas (Carrefour, Safra, Vigor, Atacadão, Nestlé...). Ordenado por empresa.",
-    PAG_B2B: "Empresas finais (e-mail corporativo, empresa informada ou listas verticais: alimentícias, atacadistas, franquias, condomínios, buffets, escolas de idiomas).",
+    PAG_CONTAS: "Contatos de empresas com 5+ contatos na base, 20+ e-mails trocados ou marcas estratégicas (Carrefour, Safra, Vigor, Atacadão, Nestlé...). Ordenado por empresa. A coluna Núcleo indica se o pedido vai para a fábrica ou para a loja.",
+    PAG_B2B: "Núcleo Fábrica: empresas finais (e-mail corporativo, empresa informada, listas setoriais) e qualquer pedido acima de 100 peças.",
     PAG_CANAL: "Canal indireto: agências de marketing/publicidade (inclui ABAP), promocionais/brindes (Brasil Promotions) e gráficas de impressão digital.",
     PAG_ESCOLAR: "Leads dos formulários de Uniforme Escolar (atacado, varejo e kit municipal) — revenda e kits.",
-    PAG_LOJA: "Núcleo loja física: pessoa física / projetos menores (e-mail pessoal sem empresa que pediu orçamento, lista Store, Copa, Sustentabilidade).",
+    PAG_LOJA: "Núcleo Loja: pedidos de até 100 peças (inclusive de empresas) e pessoa física / projetos menores (e-mail pessoal que pediu orçamento, lista Store, Copa, Sustentabilidade).",
     PAG_QUALIF: "Contatos sem sinal de empresa ou intenção (principalmente agendas de WhatsApp e históricos sem nome de empresa). Qualificar antes de disparar.",
-    PAG_SUPR: "NÃO disparar: opt-out na Locaweb, internos/testes, spam de formulário, ou sem e-mail/telefone válido.",
+    PAG_SUPR: "NÃO disparar: equipe interna, endereços automáticos, testes, opt-out na Locaweb, spam de formulário, ou sem e-mail/telefone válido.",
 }
+FAIXA_TEXTO = {"fabrica": f"Acima de {LIMITE_FABRICA} peças", "loja": f"Até {LIMITE_FABRICA} peças"}
+
+
+def nome_aba(txt, usados):
+    base = re.sub(r"[\[\]:*?/\\]", "", txt)[:31].strip()
+    nome, i = base, 2
+    while nome.lower() in usados:
+        nome = f"{base[:28]} {i}"
+        i += 1
+    usados.add(nome.lower())
+    return nome
 
 
 def fmt_data(v):
@@ -1026,6 +1207,12 @@ def escrever_excel(df, empresas, fontes_df, resumo_brutos, ref, caminho):
                                    margins_name="Total"), linha)
         seg = df[df["temperatura"] != TEMP_SUPR].groupby(["nucleo", "segmento"]).size().rename("contatos")
         linha = tabela("Segmentos (sem supressão)", seg.to_frame(), linha)
+        ativos = df[df["temperatura"] != TEMP_SUPR]
+        linha = tabela("Critério usado para definir o núcleo (sem supressão)",
+                       ativos.groupby(["nucleo", "criterio_nucleo"]).size().rename("contatos").to_frame(), linha)
+        com_setor = ativos[ativos["setor"] != ""]
+        linha = tabela("Setor × Núcleo (sem supressão)", pd.crosstab(com_setor["setor"], com_setor["nucleo"],
+                                                                      margins=True, margins_name="Total"), linha)
         linha = tabela("Top 30 empresas (por score)", empresas.head(30).set_index("Empresa")[
             ["Contatos", "Porte", "E-mails trocados (Outlook)", "Solicitações", "Temperatura (melhor)"]], linha)
         fontes = df["fontes"].str.split("; ").explode().value_counts().rename("contatos com esta fonte")
@@ -1037,6 +1224,7 @@ def escrever_excel(df, empresas, fontes_df, resumo_brutos, ref, caminho):
         nomes = {c: n for c, n, _ in COLUNAS}
         def aba(nome, dados, desc=None):
             out = dados[cols].rename(columns=nomes).copy()
+            out["Faixa de volume"] = out["Faixa de volume"].map(FAIXA_TEXTO).fillna("")
             for c in ("Data de entrada", "Última solicitação"):
                 out[c] = out[c].map(fmt_data)
             for c in ("Volume estimado (peças)", "Aberturas", "Cliques"):
@@ -1059,6 +1247,13 @@ def escrever_excel(df, empresas, fontes_df, resumo_brutos, ref, caminho):
             if p == PAG_CONTAS:
                 sub_df = sub_df.sort_values(["empresa", "score_prioridade"], ascending=[True, False])
             aba(p, sub_df, DESC_PAGINAS[p])
+        # Uma aba por grande conta (visão por empresa; os contatos continuam nas páginas acima)
+        usados = {n.lower() for n in xw.sheets}
+        for emp in contas_com_aba(df):
+            sub_df = df[(df["empresa"] == emp) & (df["temperatura"] != TEMP_SUPR)]
+            aba(nome_aba(f"Conta - {emp}", usados), sub_df,
+                f"Todos os contatos aptos da conta {emp} ({len(sub_df)}), de qualquer página. Visão para disparo "
+                f"específico da empresa — não somar com as outras abas.")
 
         # --- Empresas
         empresas.to_excel(xw, sheet_name="Empresas", index=False, startrow=2)
@@ -1094,8 +1289,14 @@ def escrever_excel(df, empresas, fontes_df, resumo_brutos, ref, caminho):
             ("Conta-Chave", "Empresa com 5+ contatos, 20+ e-mails trocados, ou marca estratégica."),
             ("Conta Média", "2–4 contatos ou 5+ e-mails trocados."),
             ("Conta Única", "1 contato."),
-            ("SCORE", "0–100: recência da solicitação (até 35) + nº de solicitações (15) + e-mails trocados (20) + engajamento Locaweb (8) + e-mail corporativo (7) + porte (10) + volume (5) + WhatsApp (3)."),
-            ("TAGS", "Separadas por '; ' no formato grupo:valor — nucleo:, temp:, pagina:, vertical:, conta:, entrada:AAAA-Tn, fonte:, carteira:, interesse:, e marcadores pediu_orcamento, historico_outlook, email_corporativo, canal:email, canal:whatsapp, ddd_assumido_11, optout, email_bounce."),
+            ("NÚCLEO", ""),
+            (NUC_FABRICA, f"Pedido informado acima de {LIMITE_FABRICA} peças; ou, sem quantidade, empresa identificada / lista setorial B2B / revenda de uniforme."),
+            (NUC_LOJA, f"Pedido informado de até {LIMITE_FABRICA} peças (mesmo sendo empresa); ou, sem quantidade, pessoa física / lista da loja."),
+            (NUC_QUALIF, "Sem quantidade e sem empresa identificada."),
+            ("SETOR", "1) lista de empresas classificadas manualmente; 2) lista setorial da Locaweb; 3) palavras no nome/domínio da empresa (banco, escola, hospital, agência...). Sem sinal: 'Não classificado'."),
+            ("SCORE", "0–100: recência da solicitação (até 35) + nº de solicitações (15) + e-mails trocados (20) + engajamento Locaweb (8) + e-mail corporativo (7) + porte (10) + pedido acima de 100 peças (5) + WhatsApp (3)."),
+            ("TAGS", "Separadas por '; ' no formato grupo:valor — nucleo:, temp:, pagina:, empresa:, setor:, volume:, vertical:, conta:, entrada:AAAA-Tn, fonte:, carteira:, interesse:, e marcadores pediu_orcamento, historico_outlook, email_corporativo, canal:email, canal:whatsapp, ddd_assumido_11, optout, email_bounce."),
+            ("ABAS 'Conta - ...'", f"As {QTD_ABAS_CONTAS} empresas com mais contatos aptos ganham uma aba própria. É uma visão por empresa: o mesmo contato também aparece em sua página."),
             ("ARQUIVOS DE DISPARO", "A pasta disparos/ traz, por página, um CSV de e-mail (só e-mails aptos) e um de WhatsApp (só celulares), sem a aba Supressão."),
         ]
         for i, (a, b) in enumerate(itens):
@@ -1103,13 +1304,19 @@ def escrever_excel(df, empresas, fontes_df, resumo_brutos, ref, caminho):
             w.write(i, 1, b, wrap)
 
 
+def contas_com_aba(df):
+    aptos = df[(df["empresa"] != "") & (df["temperatura"] != TEMP_SUPR)]
+    return aptos["empresa"].value_counts().head(QTD_ABAS_CONTAS).index.tolist()
+
+
 def tabela_empresas(df):
-    ativos = df[(df["empresa"] != "") & ~df["motivo_supressao"].isin(["Interno / teste / sistema", "Spam de formulário"])]
+    ativos = df[(df["empresa"] != "") & (df["interno"] == "") & ~df["spam"]]
     ordem_temp = {t: i for i, t in enumerate([TEMP_QUENTE, TEMP_REL, TEMP_MORNO, TEMP_FRIO, TEMP_SUPR])}
     g = ativos.groupby("empresa")
     emp = pd.DataFrame({
         "Empresa": g.size().index,
         "Contatos": g.size().values,
+        "Setor": g["setor"].agg(lambda s: s.mode().iat[0] if (s != "").any() else "").values,
         "Porte": g["porte_conta"].first().values,
         "Núcleo": g["nucleo"].agg(lambda s: s.mode().iat[0]).values,
         "Segmento": g["segmento"].agg(lambda s: s.mode().iat[0]).values,
@@ -1139,8 +1346,9 @@ def escrever_disparos(df, pasta):
             continue
         sub = df[df["pagina"] == p]
         slug = re.sub(r"[^a-z0-9]+", "_", chave_texto(p)).strip("_")
-        em = sub[sub["email_ok"]][["nome", "email", "empresa", "temperatura", "segmento", "tags"]]
-        wa = sub[sub["whatsapp_ok"]][["nome", "whatsapp", "empresa", "temperatura", "segmento", "tags"]]
+        base = ["empresa", "setor", "nucleo", "temperatura", "segmento", "tags"]
+        em = sub[sub["email_ok"]][["nome", "email"] + base]
+        wa = sub[sub["whatsapp_ok"]][["nome", "whatsapp"] + base]
         for tipo, d in (("email", em), ("whatsapp", wa)):
             f = pasta / f"{slug}__{tipo}.csv"
             d.to_csv(f, index=False, encoding="utf-8-sig", sep=";")
@@ -1153,7 +1361,18 @@ def main():
     ap.add_argument("--entrada", required=True)
     ap.add_argument("--saida", required=True)
     ap.add_argument("--data-referencia", default=dt.date.today().isoformat())
+    ap.add_argument("--equipe", help="CSV com e-mails/telefones da equipe (colunas livres) para excluir da base")
     a = ap.parse_args()
+    if a.equipe:
+        eq = ler_csv(a.equipe) if a.equipe.lower().endswith(".csv") else pd.read_excel(a.equipe, dtype=str)
+        for v in eq.astype(str).values.ravel():
+            e = normalizar_email(v) if "@" in v else None
+            t = normalizar_telefone(v) if not e else None
+            if e:
+                EQUIPE_EMAILS.add(e)
+            elif t:
+                EQUIPE_TELEFONES.add(t[0])
+        print(f"Equipe: {len(EQUIPE_EMAILS)} e-mails e {len(EQUIPE_TELEFONES)} telefones excluídos")
     ref = dt.datetime.fromisoformat(a.data_referencia)
     saida = Path(a.saida)
     saida.mkdir(parents=True, exist_ok=True)
