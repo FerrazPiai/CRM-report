@@ -1,0 +1,6 @@
+# Dados pessoais (LGPD) — NUNCA versionar: este repositório é público.
+dados_brutos/
+saida/
+*.xlsx
+*.csv
+__pycache__/
