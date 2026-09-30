@@ -1,0 +1,10 @@
+# Dados de leads (contêm dados pessoais) — nunca commitar
+*.csv
+*.xlsx
+*.xls
+*.zip
+dados/
+saida/
+raw/
+out/
+__pycache__/
