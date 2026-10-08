@@ -3,6 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const path = require('path');
+const { registrarIntegracaoTrello } = require('./integracao-trello');
 
 const app = express();
 app.use(cors());
@@ -488,6 +489,8 @@ app.get('/api/health', (req, res) => {
         rateLimiter: { activeQueues: Object.keys(rateLimiter.queues).length, effectiveLimit: `${rateLimiter.EFFECTIVE_LIMIT} req/s` }
     });
 });
+
+registrarIntegracaoTrello(app, { clientes, rateLimiter });
 
 // ═══════════════════════════════════════════════════════════════
 // PRÉ-AQUECIMENTO
